@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Hapity</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+</resources>

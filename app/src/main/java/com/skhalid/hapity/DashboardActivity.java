@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.skhalid.hapity.fragments.BottomFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
 
 
@@ -68,11 +69,15 @@ public class DashboardActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         login.onActivityResult(requestCode, resultCode, data);
- //       super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    protected void onDestroy() {
+        super.onDestroy();
+        BottomFragment.isHomeActive = false;
+        BottomFragment.isTypesActive = false;
+        BottomFragment.isAlertActive = false;
+        BottomFragment.isProfileActive = false;
     }
 }

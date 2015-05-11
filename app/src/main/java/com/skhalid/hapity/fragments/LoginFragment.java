@@ -115,7 +115,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void success(Result<TwitterSession> result) {
                 // Do something with result, which provides a TwitterSession for making API calls
                 try {
-                    TestFragment test_fragment = TestFragment.newInstance("");
+                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.dash_container, test_fragment);
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -123,8 +123,10 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 //                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     transaction.commitAllowingStateLoss();
                     DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
-                }
-                catch(Exception e){
+                    BottomFragment.isHomeActive = true;
+                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal
+                    ));
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -359,10 +361,6 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
 }
 
 

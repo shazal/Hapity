@@ -34,12 +34,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.Intent;
+import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
+import com.facebook.login.LoginBehavior;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.skhalid.hapity.DashboardActivity;
+import com.skhalid.hapity.GsonRequest;
+import com.skhalid.hapity.Jsonexample;
 import com.skhalid.hapity.R;
+import com.skhalid.hapity.VolleySingleton;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -54,6 +68,8 @@ import static android.view.View.VISIBLE;
 public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     private TwitterLoginButton loginButton;
+    CallbackManager callbackManager;
+    LoginButton fbLoginButton;
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -71,7 +87,9 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    private String type;
+    private String UserID;
+    HashMap<String, String> params;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -102,7 +120,23 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                type = "manual";
                 attemptLogin();
+            }
+        });
+
+        Button signup = (Button) getActivity().findViewById(R.id.sign_up_fragment_button);
+        signup.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SignupFragment signup = new SignupFragment();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.dash_container, signup);
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//		transaction.addToBackStack("login");
+//      getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                transaction.commit();
             }
         });
 
@@ -110,22 +144,21 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mProgressView = getActivity().findViewById(R.id.login_progress);
 
         loginButton = (TwitterLoginButton) getActivity().findViewById(R.id.twitter_login_button);
+        fbLoginButton = (LoginButton) getActivity().findViewById(R.id.fb_login_button);
+
         loginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
                 // Do something with result, which provides a TwitterSession for making API calls
                 try {
-                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
-                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, test_fragment);
-                    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//                    transaction.addToBackStack("posts");
-//                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    transaction.commitAllowingStateLoss();
-                    DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
-                    BottomFragment.isHomeActive = true;
-                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal
-                    ));
+                    showProgress(true);
+                    type = "twitter";
+                    String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
+                     params = new HashMap<String,String>();
+                    UserID = result.data.getUserId() + "";
+                    params.put("twitter_id", UserID);
+                    loadAPI(url, params);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -137,13 +170,59 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                 // Do something on failure
             }
         });
+
+        fbLoginButton.setReadPermissions("email");
+        fbLoginButton.setLoginBehavior(LoginBehavior.SSO_WITH_FALLBACK);
+        fbLoginButton.setFragment(this);
+        // If using in a fragment
+
+        callbackManager = CallbackManager.Factory.create();
+        // Other app specific specialization
+
+        // Callback registration
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+                try {
+                    showProgress(true);
+                    type = "facebook_id";
+                    String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
+                     params = new HashMap<String,String>();
+                    Profile.fetchProfileForCurrentAccessToken();
+                    UserID = Profile.getCurrentProfile().getId();
+                    params.put(type, UserID);
+                    loadAPI(url, params);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+                exception.toString();
+                Toast.makeText(getActivity(),exception.toString(),Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        loginButton.onActivityResult(requestCode, resultCode, data);
+//
+        if(requestCode == 195278 || requestCode == 64206) {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        } else {
+            loginButton.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void populateAutoComplete() {
@@ -157,11 +236,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
      * errors are presented and no actual login attempt is made.
      */
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
-        // Reset errors.
+                // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
@@ -199,8 +274,12 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
+            params = new HashMap<String,String>();
+            params.put("password", mPasswordView.getText().toString().trim());
+            params.put("email", mEmailView.getText().toString().trim());
+            loadAPI(url, params);
+
         }
     }
 
@@ -359,6 +438,123 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    private void loadAPI(String url, HashMap<String, String> params) {
+
+
+
+        GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                url,
+                Jsonexample.class,
+                null,
+                params,
+                createMyReqSuccessListener(),
+                createMyReqErrorListener());
+
+
+        VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
+    }
+
+    private Response.Listener<Jsonexample> createMyReqSuccessListener() {
+        return new Response.Listener<Jsonexample>() {
+            @Override
+            public void onResponse(Jsonexample response) {
+                try {
+                    showProgress(false);
+                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.dash_container, test_fragment);
+                    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                    transaction.addToBackStack("posts");
+//                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    transaction.commitAllowingStateLoss();
+                    DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
+                    BottomFragment.isHomeActive = true;
+                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        };
+    }
+
+    private Response.ErrorListener createMyReqErrorListener() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                int statuscode = error.networkResponse.statusCode;
+
+                if(statuscode == 500){
+                    if(type.equalsIgnoreCase("manual")) {
+                        showProgress(false);
+                        Toast.makeText(getActivity(), "User Not Found/Server Error", Toast.LENGTH_LONG);
+                    } else {
+                        String url = "http://testing.egenienext.com/project/hapity/webservice/signup/";
+
+                        loadAPI_SignUP(url, params);
+                    }
+                }
+
+
+            }
+        };
+    }
+
+    private void loadAPI_SignUP(String url, HashMap<String, String> params) {
+
+
+
+        GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                url,
+                Jsonexample.class,
+                null,
+                params,
+                createMyReqSuccessListener_SignUP(),
+                createMyReqErrorListener_SignUP());
+
+
+        showProgress(true);
+        VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
+    }
+
+    private Response.Listener<Jsonexample> createMyReqSuccessListener_SignUP() {
+        return new Response.Listener<Jsonexample>() {
+            @Override
+            public void onResponse(Jsonexample response) {
+                try {
+                    showProgress(false);
+                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.dash_container, test_fragment);
+                    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                    transaction.addToBackStack("posts");
+//                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    transaction.commitAllowingStateLoss();
+                    DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
+                    BottomFragment.isHomeActive = true;
+                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        };
+    }
+
+    private Response.ErrorListener createMyReqErrorListener_SignUP() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showProgress(false);
+                int statuscode = error.networkResponse.statusCode;
+
+                if(statuscode == 404){
+                    Toast.makeText(getActivity(), "Some Error Occured", Toast.LENGTH_LONG);
+                }
+
+
+            }
+        };
     }
 
 }

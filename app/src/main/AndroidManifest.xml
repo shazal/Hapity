@@ -37,6 +37,16 @@
             android:name="io.fabric.ApiKey"
             android:value="32fb4842bd470234b53f9644f2f4525bfa3ab02a" />
 
+        <activity android:name="com.facebook.FacebookActivity"
+            android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="Test" />
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id" />
+        <meta-data android:name="com.facebook.sdk.ApplicationName"
+            android:value="Test" />
     </application>
 
 </manifest>

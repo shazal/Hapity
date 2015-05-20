@@ -8,4 +8,26 @@
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="drawer_open">Open Navigation Drawer</string>
+    <string name="drawer_close">Close Navigation Drawer</string>
+
+    <string-array name="menu_array">
+        <item>Home</item>
+        <item>History</item>
+        <item>Settings</item>
+        <item>Invite Friends</item>
+        <item>Logout</item>
+    </string-array>
+
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/menu1selected</item>
+        <item>@drawable/menu2selected</item>
+        <item>@drawable/menu3selected</item>
+        <item>@drawable/menu4selected</item>
+        <item>@drawable/menu5selected</item>
+
+
+    </array>
 </resources>

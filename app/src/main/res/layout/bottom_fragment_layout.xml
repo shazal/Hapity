@@ -2,108 +2,108 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99000000" >
+    android:background="#6EAA54" >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bottom_bar"
         android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:weightSum="4" >
 
         <LinearLayout
-            android:id="@+id/homeEvent"
+            android:id="@+id/listsEvent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical" >
 
             <ImageButton
-                android:id="@+id/homeBtn"
+                android:id="@+id/listsBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="@null"
-                android:src="@drawable/home_icon_pressed" />
+                android:src="@drawable/lists_pressed" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Home"
+                android:text="Lists"
                 android:textColor="@android:color/background_light" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/topicEvent"
+            android:id="@+id/browseEvent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical" >
 
             <ImageButton
-                android:id="@+id/topicsBtn"
+                android:id="@+id/browseBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="@null"
-                android:src="@drawable/topics_icon_pressed" />
+                android:src="@drawable/browse_normal" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="0.2"
-                android:text="Topics"
+                android:text="Browse"
                 android:textColor="@android:color/background_light" />
         </LinearLayout>
 
 
         <LinearLayout
-            android:id="@+id/alertEvent"
+            android:id="@+id/cameraEvent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical" >
 
             <ImageButton
-                android:id="@+id/alertsBtn"
+                android:id="@+id/cameraBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="@null"
-                android:src="@drawable/alerts_icon_pressed" />
+                android:src="@drawable/camera_normal" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Alerts"
+                android:text="Camera"
                 android:textColor="@android:color/background_light" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/profileEvent"
+            android:id="@+id/mylistEvent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical" >
 
             <ImageButton
-                android:id="@+id/profileBtn"
+                android:id="@+id/mylistBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:background="@null"
-                android:src="@drawable/profile_icon_pressed" />
+                android:src="@drawable/mylist_normal" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Profile"
+                android:text="My List"
                 android:textColor="@android:color/background_light" />
         </LinearLayout>
     </LinearLayout>

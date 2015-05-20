@@ -1,0 +1,98 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal"
+    android:weightSum="4"
+     >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/home_icon_normal"
+        android:layout_weight="3.25" />
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.75"
+        android:orientation="vertical">
+            
+                <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_margin="5dp" 
+        android:textColor="@android:color/black"
+        android:hint="Name"
+        />
+    
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        >
+
+            <TextView
+                android:drawableLeft="@drawable/like"
+                android:id="@+id/likeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:textColor="@android:color/black"
+                android:text=" Like"
+                android:textSize="12sp"
+
+                />
+
+    
+
+            <TextView
+                android:drawableLeft="@drawable/dislike"
+                android:id="@+id/dislikeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/likeText"
+                android:layout_alignBottom="@+id/likeText"
+                android:textColor="@android:color/black"
+                android:text=" Dislike"
+                android:textSize="12sp"
+                android:layout_marginLeft="5dp"
+                />
+
+
+        <TextView
+            android:drawableLeft="@drawable/comment"
+            android:id="@+id/commentText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/dislikeText"
+            android:layout_alignBottom="@+id/dislikeText"
+            android:textColor="@android:color/black"
+            android:text=" Comment"
+            android:textSize="12sp"
+            android:layout_marginLeft="5dp"
+            />
+
+
+            <TextView
+                android:drawableLeft="@drawable/share"
+                android:id="@+id/shareText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/commentText"
+                android:layout_alignBottom="@+id/commentText"
+                android:textColor="@android:color/black"
+                android:text=" Share"
+                android:textSize="12sp"
+                android:layout_marginLeft="5dp"
+                />
+
+    </RelativeLayout>
+        </LinearLayout>
+
+    
+
+</LinearLayout>

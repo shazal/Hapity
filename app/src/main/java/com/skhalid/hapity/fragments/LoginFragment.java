@@ -3,14 +3,10 @@ package com.skhalid.hapity.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentResolver;
 import android.support.v4.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,13 +15,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -462,16 +458,21 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void onResponse(Jsonexample response) {
                 try {
                     showProgress(false);
-                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+
+                    setFullscreen(false);
+                    DashboardActivity.action_bar.show();
+                    BottomFragment.isHomeActive = true;
+                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
+                    BroadcastListFragment twitsFragment = new BroadcastListFragment();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, test_fragment);
+                    transaction.replace(R.id.dash_container, twitsFragment);
+
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("posts");
 //                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     transaction.commitAllowingStateLoss();
                     DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
-                    BottomFragment.isHomeActive = true;
-                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal));
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -524,16 +525,21 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void onResponse(Jsonexample response) {
                 try {
                     showProgress(false);
-                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+
+                    setFullscreen(false);
+                    DashboardActivity.action_bar.show();
+                    BottomFragment.isHomeActive = true;
+                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
+                    BroadcastListFragment twitsFragment = new BroadcastListFragment();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, test_fragment);
+                    transaction.replace(R.id.dash_container, twitsFragment);
+
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("posts");
 //                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     transaction.commitAllowingStateLoss();
                     DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
-                    BottomFragment.isHomeActive = true;
-                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal));
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -557,6 +563,19 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         };
     }
 
+    private void setFullscreen(boolean fullscreen)
+    {
+        WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
+        if (fullscreen)
+        {
+            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        else
+        {
+            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        getActivity().getWindow().setAttributes(attrs);
+    }
 }
 
 

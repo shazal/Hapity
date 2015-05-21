@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
 import com.skhalid.hapity.fragments.BottomFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
 
@@ -267,5 +268,11 @@ public class DashboardActivity extends ActionBarActivity {
             attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
         }
         getWindow().setAttributes(attrs);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LoginManager.getInstance().logOut();
     }
 }

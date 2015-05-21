@@ -3,56 +3,33 @@ package com.skhalid.hapity.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.provider.ContactsContract;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginBehavior;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.skhalid.hapity.DashboardActivity;
 import com.skhalid.hapity.GsonRequest;
 import com.skhalid.hapity.Jsonexample;
 import com.skhalid.hapity.R;
 import com.skhalid.hapity.VolleySingleton;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.TwitterSession;
-import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import static android.view.View.VISIBLE;
 
 
-public class SignupFragment extends Fragment  {
+public class SignupFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -65,6 +42,7 @@ public class SignupFragment extends Fragment  {
     private AutoCompleteTextView mNameView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mPaasswordConfirmView;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -77,6 +55,7 @@ public class SignupFragment extends Fragment  {
         mNameView = (AutoCompleteTextView) getActivity().findViewById(R.id.name_sign_up);
 
         mPasswordView = (EditText) getActivity().findViewById(R.id.password_sign_up);
+        mPaasswordConfirmView = (EditText) getActivity().findViewById(R.id.password_sign_up_confirm);
 //        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 //            @Override
 //            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -119,11 +98,13 @@ public class SignupFragment extends Fragment  {
         mEmailView.setError(null);
         mPasswordView.setError(null);
         mNameView.setError(null);
+        mPaasswordConfirmView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         String name = mNameView.getText().toString();
+        String cpw = mPaasswordConfirmView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -138,6 +119,12 @@ public class SignupFragment extends Fragment  {
         if (TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
+            cancel = true;
+        }
+
+        if(!password.equalsIgnoreCase(cpw)){
+            mPaasswordConfirmView.setError("Password does not match");
+            focusView = mPaasswordConfirmView;
             cancel = true;
         }
 
@@ -239,7 +226,7 @@ public class SignupFragment extends Fragment  {
             public void onResponse(Jsonexample response) {
                 try {
                     showProgress(false);
-                    TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+                    BroadcastFragment test_fragment = new BroadcastFragment();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.dash_container, test_fragment);
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

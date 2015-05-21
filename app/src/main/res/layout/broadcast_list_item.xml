@@ -35,7 +35,6 @@
             android:textSize="13sp"
             android:textColor="@android:color/white"
 
-
             />
         <TextView
             android:drawableLeft="@drawable/like"

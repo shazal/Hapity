@@ -42,4 +42,6 @@ dependencies {
     compile project(':facebook')
     compile files('libs/volley.jar')
     compile 'com.google.code.gson:gson:2.3'
+    compile 'info.hoang8f:android-segmented:1.0.5'
+
 }

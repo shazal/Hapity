@@ -1,0 +1,67 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="${relativePackage}.${activityClass}"
+    android:background="@drawable/bg"
+    android:weightSum="10"
+    >
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/tw__solid_white"
+        android:gravity="center"
+        android:layout_weight="0.75">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:text="title"
+            android:textColor="#000"
+            android:textSize="20sp" />
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/video"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6.25"
+        android:layout_margin="15dp">
+
+
+            <VideoView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/video_view"
+                android:textColor="#000"
+                android:textSize="20sp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"/>
+
+
+
+    </RelativeLayout>
+
+
+
+
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3.0"
+
+        >
+
+    </ListView>
+
+
+
+
+
+
+</LinearLayout>

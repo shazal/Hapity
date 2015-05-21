@@ -32,11 +32,6 @@ public class SplashScreen extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
-        TextView stext = (TextView) findViewById(R.id.app_name);
-        Typeface tf = Typeface.createFromAsset(getApplicationContext().getAssets(),
-                "ManilaSansBld.otf");
-
-        stext.setTypeface(tf);
 
         new Handler().postDelayed(new Runnable() {
 

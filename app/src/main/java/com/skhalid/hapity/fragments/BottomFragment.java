@@ -136,11 +136,11 @@ public class BottomFragment extends Fragment implements OnClickListener
 					isProfileActive = false;
 					profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_normal));
 
-					TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+					ShareBroadcast shareBroadcast = new ShareBroadcast();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, test_fragment);
+					transaction.replace(R.id.dash_container, shareBroadcast);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-					transaction.addToBackStack("alerts");
+					transaction.addToBackStack("share");
 					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					transaction.commit();
 

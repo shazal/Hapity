@@ -6,12 +6,18 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.skhalid.hapity.fragments.BroadcastFragment;
+import com.skhalid.hapity.fragments.LoginFragment;
+import com.skhalid.hapity.fragments.ProfileFragment;
 
 
 public class BroadcastListAdapter extends BaseAdapter implements OnClickListener {
@@ -72,6 +78,20 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
              vi = inflater.inflate(R.layout.broadcast_list_item, null);
              holder = new ViewHolder();
              holder.name = (TextView) vi.findViewById(R.id.nameText);
+             holder.name.setOnClickListener(new OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
+
+                     ProfileFragment profileFragment = new ProfileFragment();
+                     FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+                     transaction.replace(R.id.dash_container, profileFragment);
+                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                     transaction.addToBackStack("Profile89++Fragment");
+                     activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                     transaction.commit();
+
+                 }
+             });
              holder.like = (TextView) vi.findViewById(R.id.likeText);
              holder.dislike=(TextView)vi.findViewById(R.id.dislikeText);
 //             holder.userImage=(ImageView)vi.findViewById(R.id.userPhoto);
@@ -128,18 +148,14 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
         }
 
 		private void performAction(int mPosition2) {
-//			// TODO Auto-generated method stub
-//			DreamDetailModal DDM = new DreamDetailModal(); 
-//			BroadcastModal tm = BroadcastListFragment.tweatArray.get(mPosition2);
-//			DDM.setTweetTime(tm.getTweatTime());
-//			DDM.setUserName(tm.getUserName());
-//			DDM.setUserPhoto(tm.getUserPhoto());
-//			DreamDetails dreamDetails = new DreamDetails();
-//			FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-//			transaction.replace(R.id.dash_container, dreamDetails);
-//			transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//			transaction.addToBackStack(null);
-//			transaction.commit();
+
+            BroadcastFragment broadcastFragment = new BroadcastFragment();
+            FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.dash_container, broadcastFragment);
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            transaction.addToBackStack("BraodcastFragment");
+            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            transaction.commit();
 			
 		}               
     }   

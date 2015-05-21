@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
+
+        <RelativeLayout
+            android:id="@+id/video1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp">
+
+
+            <VideoView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/video_view1"
+                android:textColor="#000"
+                android:textSize="20sp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentTop="true"/>
+
+
+
+        </RelativeLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:gravity="right"
+        android:text="view Profile"
+        android:textColor="@color/tw__solid_white"
+        android:textSize="15sp"
+        android:layout_marginRight="15dp"
+        android:id="@+id/view_profile"
+        android:layout_weight="0.8"
+        android:layout_marginTop="10dp"
+        />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/tw__solid_white"
+        android:id="@+id/line_image"
+        android:layout_weight="0.05"/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:textSize="15sp"
+        android:text="dummy line"
+        android:textColor="@color/tw__solid_white"
+        android:id="@+id/description"
+        android:layout_weight="2.15"
+        android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#99000000"
+        android:orientation="vertical"
+        android:weightSum="10"
+        android:visibility="gone"
+        android:id="@+id/overlay_LL">
+        <!--android:visibility="gone"-->
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:src="@drawable/bg"
+            android:id="@+id/dp"
+            android:layout_marginTop="15dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="just testing"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:textSize="25sp"
+            android:textColor="@color/tw__solid_white"
+            android:id="@+id/user_name"
+            android:layout_weight="0.75"/>
+
+        <info.hoang8f.android.segmented.SegmentedGroup
+            xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/segmented2"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_margin="3dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            segmentedgroup:border_width="2dp"
+            segmentedgroup:corner_radius="20dp">
+
+            <RadioButton
+                android:id="@+id/button21"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Followers"
+                style="@style/RadioButton"
+                />
+
+            <RadioButton
+                android:id="@+id/button22"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="Following"
+                style="@style/RadioButton" />
+        </info.hoang8f.android.segmented.SegmentedGroup>
+
+        <ListView
+            android:id="@+id/listView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4.5"
+            android:layout_gravity="center">
+
+        </ListView>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3.25">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/Followbtn"
+            android:text="Follow"
+            android:textColor="@color/tw__solid_white"
+            android:background="@drawable/button4unselected"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

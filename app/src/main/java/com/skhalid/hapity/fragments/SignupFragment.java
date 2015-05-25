@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.skhalid.hapity.DashboardActivity;
@@ -208,6 +209,7 @@ public class SignupFragment extends Fragment {
 
 
         GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                Request.Method.POST,
                 url,
                 Jsonexample.class,
                 null,

@@ -1,9 +1,10 @@
 package com.skhalid.hapity;
 
-import android.app.SearchManager;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.content.res.Configuration;
@@ -13,7 +14,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -25,10 +25,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
@@ -45,6 +46,7 @@ public class DashboardActivity extends ActionBarActivity {
 
     public static ActionBar action_bar;
     public static Fragment bottom_fragment;
+    private static Dialog customProgressDialog;
     private LoginFragment login;
 
     private DrawerLayout mDrawerLayout;
@@ -62,9 +64,15 @@ public class DashboardActivity extends ActionBarActivity {
     private NavDrawerListAdapter adapter;
 
 
+    public static SharedPreferences hapityPref;
+    public static final String PREFS_NAME = "HapityPreferences";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        hapityPref = getSharedPreferences(PREFS_NAME, 0);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
@@ -210,7 +218,7 @@ public class DashboardActivity extends ActionBarActivity {
         BottomFragment.isHomeActive = false;
         BottomFragment.isTypesActive = false;
         BottomFragment.isAlertActive = false;
-        BottomFragment.isProfileActive = false;
+        BottomFragment.isMyListsActive = false;
     }
 
     /* The click listner for ListView in the navigation drawer */
@@ -274,5 +282,29 @@ public class DashboardActivity extends ActionBarActivity {
     public void onBackPressed() {
         super.onBackPressed();
         LoginManager.getInstance().logOut();
+    }
+
+    public static void showCustomProgress(final Context context, String Msg, Boolean isCancelable) {
+        if (customProgressDialog != null)
+            while (customProgressDialog.isShowing())
+                customProgressDialog.dismiss();
+
+        customProgressDialog = new Dialog(context, R.style.customDialogTheme);
+        customProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        customProgressDialog.setContentView(R.layout.waitlayout);
+        customProgressDialog.setCancelable(isCancelable);
+
+        if (Msg.length() > 1) {
+            TextView tv = (TextView) customProgressDialog.findViewById(R.id.customprogress_text);
+            tv.setVisibility(View.VISIBLE);
+            tv.setText(Msg);
+        }
+
+        customProgressDialog.show();
+    }
+
+    public static void dismissCustomProgress(){
+        if(customProgressDialog.isShowing())
+            customProgressDialog.dismiss();
     }
 }

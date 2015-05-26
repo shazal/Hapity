@@ -87,7 +87,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                      transaction.replace(R.id.dash_container, profileFragment);
                      transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                      transaction.addToBackStack("Profile89++Fragment");
-                     activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                     activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                      transaction.commit();
 
                  }
@@ -154,7 +154,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
             transaction.replace(R.id.dash_container, broadcastFragment);
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             transaction.addToBackStack("BraodcastFragment");
-            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             transaction.commit();
 			
 		}               

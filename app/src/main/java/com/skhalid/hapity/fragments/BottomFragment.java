@@ -21,7 +21,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 	public static ImageButton alertButton;
 	public static ImageButton homeButton;
 	public static boolean isTypesActive = false;
-	public static boolean isProfileActive = false;
+	public static boolean isMyListsActive = false;
 	public static boolean isAlertActive = false;
 	public static boolean isHomeActive = false;
 	LinearLayout topicLayout,homeLayout,profileLayout,alertLayout;
@@ -68,14 +68,14 @@ public class BottomFragment extends Fragment implements OnClickListener
 					topics_btn.setImageDrawable(getResources().getDrawable(R.drawable.browse_pressed));
 					isAlertActive = false;
 					alertButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_normal));
-					isProfileActive = false;
+					isMyListsActive = false;
 					profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_normal));
 
-					TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+					BrowseFragment browseFragment = new BrowseFragment();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, test_fragment);
+					transaction.replace(R.id.dash_container, browseFragment);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    transaction.addToBackStack("topics");
+                    transaction.addToBackStack("browse");
                     getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					transaction.commit();
 
@@ -96,7 +96,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 		}
 		else if((v.getId() == R.id.mylistBtn) || (v.getId() == R.id.mylistEvent))
 		{
-			if(!isProfileActive)
+			if(!isMyListsActive)
 			{
 				try {
 					isHomeActive = false;
@@ -105,12 +105,12 @@ public class BottomFragment extends Fragment implements OnClickListener
 					topics_btn.setImageDrawable(getResources().getDrawable(R.drawable.browse_normal));
 					isAlertActive = false;
 					alertButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_normal));
-					isProfileActive = true;
+					isMyListsActive = true;
 					profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_pressed));
 
-					TestFragment test_fragment = TestFragment.newInstance("Test Fragment");
+					MyListsFragment myListsFragment = new MyListsFragment();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, test_fragment);
+					transaction.replace(R.id.dash_container, myListsFragment);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 					transaction.addToBackStack("profile");
 					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -133,7 +133,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 					topics_btn.setImageDrawable(getResources().getDrawable(R.drawable.browse_normal));
 					isAlertActive = true;
 					alertButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_pressed));
-					isProfileActive = false;
+					isMyListsActive = false;
 					profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_normal));
 
 					ShareBroadcast shareBroadcast = new ShareBroadcast();
@@ -164,7 +164,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 					topics_btn.setImageDrawable(getResources().getDrawable(R.drawable.browse_normal));
 					isAlertActive = false;
 					alertButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_normal));
-					isProfileActive = false;
+					isMyListsActive = false;
 					profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_normal));
 
 					BroadcastListFragment broadcastListFragment = new BroadcastListFragment();

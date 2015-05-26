@@ -36,6 +36,7 @@ import java.util.List;
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.facebook.CallbackManager;
@@ -441,6 +442,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
 
         GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                Request.Method.POST,
                 url,
                 Jsonexample.class,
                 null,
@@ -458,7 +460,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void onResponse(Jsonexample response) {
                 try {
                     showProgress(false);
-
+                    DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
                     setFullscreen(false);
                     DashboardActivity.action_bar.show();
                     BottomFragment.isHomeActive = true;
@@ -507,6 +509,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
 
         GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                Request.Method.POST,
                 url,
                 Jsonexample.class,
                 null,
@@ -526,6 +529,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                 try {
                     showProgress(false);
 
+                    DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
                     setFullscreen(false);
                     DashboardActivity.action_bar.show();
                     BottomFragment.isHomeActive = true;

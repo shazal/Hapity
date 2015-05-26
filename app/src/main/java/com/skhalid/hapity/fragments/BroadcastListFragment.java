@@ -12,28 +12,27 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.skhalid.hapity.BroadcastModal;
-import com.skhalid.hapity.DashboardActivity;
 import com.skhalid.hapity.R;
 import com.skhalid.hapity.BroadcastListAdapter;
 
 public class BroadcastListFragment extends Fragment {
 
-	ListView tweatList;
+	ListView BroadcastList;
 	BroadcastListAdapter adapter;
-	public static ArrayList<BroadcastModal> tweatArray = new ArrayList<BroadcastModal>();
+	public static ArrayList<BroadcastModal> broadcastArray = new ArrayList<BroadcastModal>();
 	@Override
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View rootView = inflater.inflate(R.layout.broadcast_list_fragment_layout, container,false);
-		tweatList = (ListView) rootView.findViewById(R.id.broadcastList);
+		BroadcastList = (ListView) rootView.findViewById(R.id.broadcastList);
 
-		adapter = new BroadcastListAdapter(getActivity(),tweatArray, getActivity().getResources());
+		adapter = new BroadcastListAdapter(getActivity(), broadcastArray, getActivity().getResources());
 
 		if(BottomFragment.isHomeActive) {
-			tweatArray.clear();
+			broadcastArray.clear();
 			setListData();
-			tweatList.setAdapter(adapter);
+			BroadcastList.setAdapter(adapter);
 		}
 
 		return rootView;
@@ -54,9 +53,9 @@ public class BroadcastListFragment extends Fragment {
 		{
 			final BroadcastModal sched = new BroadcastModal();
 			sched.setUserName("John Doe");
-			tweatArray.add(sched);
+			broadcastArray.add(sched);
 		}
-		Toast.makeText(getActivity(), tweatArray.size()+"", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getActivity(), broadcastArray.size()+"", Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override

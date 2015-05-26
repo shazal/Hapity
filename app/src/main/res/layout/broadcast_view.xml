@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}"
-    android:background="@drawable/bg"
+    android:background="@drawable/background"
     android:weightSum="10"
     >
     <LinearLayout

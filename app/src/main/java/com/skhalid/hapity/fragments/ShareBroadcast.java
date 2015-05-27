@@ -48,8 +48,6 @@ public class ShareBroadcast extends Fragment {
 //                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 transaction.commit();
 
-                DashboardActivity.bottom_fragment.getView().setVisibility(View.INVISIBLE);
-
             }
         });
 

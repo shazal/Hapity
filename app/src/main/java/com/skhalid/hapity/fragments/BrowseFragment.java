@@ -13,11 +13,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.google.gson.internal.LinkedTreeMap;
+import com.skhalid.hapity.BroadcastDetails;
 import com.skhalid.hapity.BroadcastListAdapter;
 import com.skhalid.hapity.BroadcastModal;
+import com.skhalid.hapity.DashboardActivity;
+import com.skhalid.hapity.GsonRequest;
+import com.skhalid.hapity.MainBroadcast;
 import com.skhalid.hapity.R;
+import com.skhalid.hapity.UsersAdapter;
+import com.skhalid.hapity.VolleySingleton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by skhalid on 5/25/2015.
@@ -41,25 +52,27 @@ public class BrowseFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    performSearch();
+                    performSearch(v.getText().toString().trim());
                     return true;
                 }
                 return false;
             }
         });
-        adapter = new BroadcastListAdapter(getActivity(), broadcastArray, getActivity().getResources());
+
 
         if(BottomFragment.isTypesActive) {
-            broadcastArray.clear();
+
             setListData();
-            BroadcastList.setAdapter(adapter);
+
         }
 
         return rootView;
     }
 
-    private void performSearch() {
+    private void performSearch(String Search) {
+        String url = "http://testing.egenienext.com/project/hapity/webservice/getbroadcast?search="+Search;
 
+        loadAPI(url, null);
     }
 
 
@@ -71,20 +84,74 @@ public class BrowseFragment extends Fragment {
     }
 
     private void setListData() {
-        // TODO Auto-generated method stub
 
-        for (int i = 1; i<=10; i++)
-        {
-            final BroadcastModal sched = new BroadcastModal();
-            sched.setUserName("John Doe");
-            broadcastArray.add(sched);
-        }
-        Toast.makeText(getActivity(), broadcastArray.size() + "", Toast.LENGTH_SHORT).show();
+        String url = "http://testing.egenienext.com/project/hapity/webservice/getbroadcast?user_id=0";
+
+        loadAPI(url, null);
     }
 
     @Override
     public void onStop() {
         // TODO Auto-generated method stub
         super.onStop();
+    }
+
+    private void loadAPI(String url, HashMap<String, String> params) {
+
+        DashboardActivity.showCustomProgress(getActivity(), "", false);
+        GsonRequest<MainBroadcast[]> myReq = new GsonRequest<MainBroadcast[]>(
+                Request.Method.GET,
+                url,
+                MainBroadcast[].class,
+                null,
+                params,
+                createMyReqSuccessListener(),
+                createMyReqErrorListener());
+
+
+        VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
+    }
+
+
+    private Response.Listener<MainBroadcast[]> createMyReqSuccessListener() {
+        return new Response.Listener<MainBroadcast[]>() {
+            @Override
+            public void onResponse(MainBroadcast[] response) {
+                try {
+
+                    BroadcastDetails[] bDetails = response[1].broadcast;
+//                    LinkedTreeMap<String,LinkedTreeMap<String,String>> obj = ((LinkedTreeMap) response);
+                    broadcastArray = new ArrayList<BroadcastModal>();
+                    for(int i = 0; i<bDetails.length; i++){
+                        final BroadcastModal sched = new BroadcastModal();
+                        sched.setUserName(bDetails[i].screen_name);
+                        sched.title=bDetails[i].title;
+                        sched.stream_url=bDetails[i].stream_url;
+                        sched.id = bDetails[i].id;
+                        sched.broadcast_image = bDetails[i].broadcast_image;
+                        broadcastArray.add(sched);
+
+                    }
+                    DashboardActivity.dismissCustomProgress();
+
+                    adapter = new BroadcastListAdapter(getActivity(), broadcastArray, getActivity().getResources());
+                    BroadcastList.setAdapter(adapter);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        };
+    }
+
+    private Response.ErrorListener createMyReqErrorListener() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                int statuscode = error.networkResponse.statusCode;
+                DashboardActivity.dismissCustomProgress();
+                Toast.makeText(getActivity(), "Some Problem With Web Service", Toast.LENGTH_LONG).show();
+            }
+        };
     }
 }

@@ -3,6 +3,7 @@ package com.skhalid.hapity.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -42,6 +43,8 @@ import com.android.volley.VolleyError;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginBehavior;
 import com.facebook.login.LoginResult;
@@ -57,7 +60,11 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import static android.view.View.VISIBLE;
+import static android.view.View.getDefaultSize;
 
 /**
  * A login screen that offers login via email/password.
@@ -82,15 +89,17 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
     private View mLoginFormView;
     private String type;
     private String UserID;
     HashMap<String, String> params;
+    public static SharedPreferences pref;
+    public static final String PREFS_NAME = "MyPrefsFile";
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView=  inflater.inflate(R.layout.activity_login, null);
+
         return rootView;
     }
 
@@ -98,6 +107,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Set up the login form.
+        pref = getActivity().getSharedPreferences(PREFS_NAME, 0);
         mEmailView = (AutoCompleteTextView) getActivity().findViewById(R.id.email);
         populateAutoComplete();
 
@@ -138,7 +148,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         });
 
         mLoginFormView = getActivity().findViewById(R.id.login_form);
-        mProgressView = getActivity().findViewById(R.id.login_progress);
+
 
         loginButton = (TwitterLoginButton) getActivity().findViewById(R.id.twitter_login_button);
         fbLoginButton = (LoginButton) getActivity().findViewById(R.id.fb_login_button);
@@ -148,7 +158,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void success(Result<TwitterSession> result) {
                 // Do something with result, which provides a TwitterSession for making API calls
                 try {
-                    showProgress(true);
+                    DashboardActivity.showCustomProgress(getActivity(), "", false);
                     type = "twitter";
                     String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
                      params = new HashMap<String,String>();
@@ -182,14 +192,35 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void onSuccess(LoginResult loginResult) {
                 // App code
                 try {
-                    showProgress(true);
+                    DashboardActivity.showCustomProgress(getActivity(), "", false);
                     type = "facebook_id";
-                    String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
-                     params = new HashMap<String,String>();
-                    Profile.fetchProfileForCurrentAccessToken();
-                    UserID = Profile.getCurrentProfile().getId();
-                    params.put(type, UserID);
-                    loadAPI(url, params);
+
+                    params = new HashMap<String,String>();
+                    GraphRequest request = GraphRequest.newMeRequest(
+                            loginResult.getAccessToken(),
+                            new GraphRequest.GraphJSONObjectCallback() {
+                                @Override
+                                public void onCompleted(
+                                        JSONObject object,
+                                        GraphResponse response) {
+                                    // Application code
+                                    try {
+                                        UserID = object.getString("id");
+                                        params.put(type, UserID);
+                                        String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
+                                        loadAPI(url, params);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                    Bundle parameters = new Bundle();
+                    parameters.putString("fields", "id,name,email,gender, birthday");
+                    request.setParameters(parameters);
+                    request.executeAsync();
+//                    Profile.fetchProfileForCurrentAccessToken();
+//                    UserID = Profile.getCurrentProfile().getId();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -270,7 +301,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            DashboardActivity.showCustomProgress(getActivity(), "", false);
             String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
             params = new HashMap<String,String>();
             params.put("password", mPasswordView.getText().toString().trim());
@@ -287,44 +318,9 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() >= 4;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : VISIBLE);
-        }
-    }
 
     @Override
     public android.support.v4.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -420,7 +416,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
+            DashboardActivity.dismissCustomProgress();
 
             if (success) {
                 getActivity().finish();
@@ -433,7 +429,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            showProgress(false);
+            DashboardActivity.dismissCustomProgress();
         }
     }
 
@@ -459,7 +455,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             @Override
             public void onResponse(Jsonexample response) {
                 try {
-                    showProgress(false);
+                    DashboardActivity.dismissCustomProgress();
                     DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
                     setFullscreen(false);
                     DashboardActivity.action_bar.show();
@@ -490,8 +486,8 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
                 if(statuscode == 500){
                     if(type.equalsIgnoreCase("manual")) {
-                        showProgress(false);
-                        Toast.makeText(getActivity(), "User Not Found/Server Error", Toast.LENGTH_LONG);
+                        DashboardActivity.dismissCustomProgress();
+                        Toast.makeText(getActivity(), "User Not Found/Server Error", Toast.LENGTH_LONG).show();
                     } else {
                         String url = "http://testing.egenienext.com/project/hapity/webservice/signup/";
 
@@ -518,7 +514,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                 createMyReqErrorListener_SignUP());
 
 
-        showProgress(true);
+        DashboardActivity.showCustomProgress(getActivity(), "", false);
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 
@@ -527,7 +523,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             @Override
             public void onResponse(Jsonexample response) {
                 try {
-                    showProgress(false);
+                    DashboardActivity.dismissCustomProgress();
 
                     DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
                     setFullscreen(false);
@@ -555,7 +551,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                showProgress(false);
+                DashboardActivity.dismissCustomProgress();
                 int statuscode = error.networkResponse.statusCode;
 
                 if(statuscode == 404){

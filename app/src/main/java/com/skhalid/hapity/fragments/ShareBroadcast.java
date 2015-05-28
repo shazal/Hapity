@@ -9,7 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -35,6 +38,7 @@ public class ShareBroadcast extends Fragment {
         View rootView = inflater.inflate(R.layout.share_broadcast, container, false);
 
         ImageButton startRecordingBtn = (ImageButton) rootView.findViewById(R.id.startBroadcastBtn);
+        CheckBox shareLocation = (CheckBox) rootView.findViewById(R.id.radio_button_share);
 
         startRecordingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +52,16 @@ public class ShareBroadcast extends Fragment {
 //                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 transaction.commit();
 
+            }
+        });
+
+        shareLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    DashboardActivity.hapityPref.edit().putBoolean("shareLocation",true).commit();
+                } else
+                    DashboardActivity.hapityPref.edit().putBoolean("shareLocation",false).commit();
             }
         });
 

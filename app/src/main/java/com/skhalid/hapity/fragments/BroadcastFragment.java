@@ -77,7 +77,7 @@ public class BroadcastFragment extends Fragment {
         commentsArray.add(new Comments());
         commentsArray.add(new Comments());
 
-        commentAdapter = new CommentsAdapter(getActivity().getApplicationContext(), R.layout.listitem, commentsArray);
+        commentAdapter = new CommentsAdapter(getActivity(), R.layout.listitem, commentsArray);
         commentsList.setAdapter(commentAdapter);
 	}
     

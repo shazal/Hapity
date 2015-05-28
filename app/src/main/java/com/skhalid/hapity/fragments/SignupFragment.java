@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -168,41 +169,6 @@ public class SignupFragment extends Fragment {
         return password.length() > 4;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    public void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : VISIBLE);
-        }
-    }
 
     private void loadAPI(String url, HashMap<String, String> params) {
 
@@ -218,7 +184,7 @@ public class SignupFragment extends Fragment {
                 createMyReqErrorListener());
 
 
-        showProgress(true);
+        DashboardActivity.showCustomProgress(getActivity(), "", false);
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 
@@ -227,17 +193,20 @@ public class SignupFragment extends Fragment {
             @Override
             public void onResponse(Jsonexample response) {
                 try {
-                    showProgress(false);
-                    BroadcastFragment test_fragment = new BroadcastFragment();
+                    DashboardActivity.dismissCustomProgress();
+                    setFullscreen(false);
+                    DashboardActivity.action_bar.show();
+                    BottomFragment.isHomeActive = true;
+                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
+                    BroadcastListFragment twitsFragment = new BroadcastListFragment();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, test_fragment);
+                    transaction.replace(R.id.dash_container, twitsFragment);
+
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("posts");
 //                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     transaction.commitAllowingStateLoss();
                     DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
-                    BottomFragment.isHomeActive = true;
-                    BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.home_icon_normal));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -249,7 +218,7 @@ public class SignupFragment extends Fragment {
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                showProgress(false);
+                DashboardActivity.dismissCustomProgress();
                 int statuscode = error.networkResponse.statusCode;
 
                 if(statuscode == 404){
@@ -259,6 +228,20 @@ public class SignupFragment extends Fragment {
 
             }
         };
+    }
+
+    private void setFullscreen(boolean fullscreen)
+    {
+        WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
+        if (fullscreen)
+        {
+            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        else
+        {
+            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        }
+        getActivity().getWindow().setAttributes(attrs);
     }
 
 }

@@ -3,11 +3,16 @@ package com.skhalid.hapity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+
+import com.skhalid.hapity.fragments.ProfileFragment;
 
 import java.util.ArrayList;
 
@@ -16,8 +21,8 @@ import java.util.ArrayList;
  */
 public class CommentsAdapter extends ArrayAdapter<Comments> {
     private final ArrayList<Comments> comments;
-    Context context = null;
-    public CommentsAdapter(Context context, int textViewResourceId, ArrayList<Comments> comments) {
+    private FragmentActivity context = null;
+    public CommentsAdapter( FragmentActivity context, int textViewResourceId, ArrayList<Comments> comments) {
 
         super(context, textViewResourceId, comments);
         this.comments = comments;
@@ -58,6 +63,19 @@ public class CommentsAdapter extends ArrayAdapter<Comments> {
         Bitmap resized = Bitmap.createScaledBitmap(icon, 150, 150, true);
         resized = roundedImageView.getCroppedBitmap(resized, 150);
         imagep.setImageBitmap(resized);
+
+        imagep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFragment profileFragment = new ProfileFragment();
+                FragmentTransaction transaction = context.getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.dash_container, profileFragment);
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                transaction.addToBackStack("Profile89++Fragment");
+                context.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                transaction.commit();
+            }
+        });
 
 
         return arg1;

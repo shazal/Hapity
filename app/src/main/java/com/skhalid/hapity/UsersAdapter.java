@@ -8,16 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 /**
  * Created by sIrshad on 5/17/2015.
  */
-public class UsersAdapter extends ArrayAdapter<Users> {
-    private final ArrayList<Users> users;
+public class UsersAdapter extends ArrayAdapter<FollowersInfo> {
+    private final ArrayList<FollowersInfo> users;
     Context context = null;
-    public UsersAdapter(Context context, int textViewResourceId, ArrayList<Users> users) {
+    public UsersAdapter(Context context, int textViewResourceId, ArrayList<FollowersInfo> users) {
 
         super(context, textViewResourceId, users);
         this.users = users;
@@ -30,7 +31,7 @@ public class UsersAdapter extends ArrayAdapter<Users> {
     }
 
     @Override
-    public Users getItem(int arg0) {
+    public FollowersInfo getItem(int arg0) {
         // TODO Auto-generated method stub
         return users.get(arg0);
     }
@@ -51,13 +52,18 @@ public class UsersAdapter extends ArrayAdapter<Users> {
             arg1 = inflater.inflate(R.layout.userlistitem, arg2,false);
         }
 
-        RoundedImageView roundedImageView = new RoundedImageView(context);
-        ImageView imagep = (ImageView) arg1.findViewById(R.id.imageView1);
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.lums);
-        Bitmap resized = Bitmap.createScaledBitmap(icon, 150, 150, true);
-        resized = roundedImageView.getCroppedBitmap(resized, 150);
-        imagep.setImageBitmap(resized);
+        if(users.size()>0) {
+            RoundedImageView roundedImageView = new RoundedImageView(context);
+            ImageView imagep = (ImageView) arg1.findViewById(R.id.imageView1);
+            Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                    R.drawable.lums);
+            Bitmap resized = Bitmap.createScaledBitmap(icon, 150, 150, true);
+            resized = roundedImageView.getCroppedBitmap(resized, 150);
+            imagep.setImageBitmap(resized);
+
+            TextView username = (TextView) arg1.findViewById(R.id.UserName);
+            username.setText(users.get(arg0).screen_name);
+        }
 
 
         return arg1;

@@ -9,10 +9,24 @@
         android:text="title"
         android:textColor="#000"
         android:textSize="20sp"
+        android:id="@+id/share_title"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:background="@color/tw__solid_white"/>
+    <CheckBox
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:checked="false"
+        android:text=" Use Location"
+        android:id="@+id/radio_button_share"
+        android:paddingLeft="4dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:button="@drawable/custom_radio_button_selector"
+        android:layout_below="@+id/share_title"
+        android:textColor="@color/tw__solid_white"/>
+
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

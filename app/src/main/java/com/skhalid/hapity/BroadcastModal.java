@@ -11,6 +11,10 @@ public class BroadcastModal {
 	private String share = " Share";
 	private String status = " Offline";
 	private String type = "";
+	public String id;
+	public String title;
+	public String stream_url;
+	public String broadcast_image;
 
 	public String getUserName() {
 		return userName;

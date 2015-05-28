@@ -1,5 +1,7 @@
 package com.skhalid.hapity;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +13,12 @@ import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -34,6 +39,11 @@ import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.skhalid.hapity.fragments.BottomFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
 
@@ -42,7 +52,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
-public class DashboardActivity extends ActionBarActivity {
+public class DashboardActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     public static ActionBar action_bar;
     public static Fragment bottom_fragment;
@@ -63,6 +73,10 @@ public class DashboardActivity extends ActionBarActivity {
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private LocationManager lm;
+    private Location mCurrentLocation;
 
     public static SharedPreferences hapityPref;
     public static final String PREFS_NAME = "HapityPreferences";
@@ -176,6 +190,8 @@ public class DashboardActivity extends ActionBarActivity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        buildGoogleApiClient();
     }
 
     @Override
@@ -219,6 +235,81 @@ public class DashboardActivity extends ActionBarActivity {
         BottomFragment.isTypesActive = false;
         BottomFragment.isAlertActive = false;
         BottomFragment.isMyListsActive = false;
+        
+        mGoogleApiClient.disconnect();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+
+    }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setFastestInterval(2500);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected void startLocationUpdates() {
+        try{
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        } catch(Exception e){
+            e.getLocalizedMessage();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || !lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+            changeModetoHighAccuracy();
+
+        if (mCurrentLocation == null) {
+            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+//            updateUI();
+        }
+
+        // If the user presses the Start Updates button before GoogleApiClient connects, we set
+        // mRequestingLocationUpdates to true (see startUpdatesButtonHandler()). Here, we check
+        // the value of mRequestingLocationUpdates and if it is true, we start location updates.
+
+            startLocationUpdates();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if(!lm.isProviderEnabled(LocationManager.GPS_PROVIDER) && location.getAccuracy() > 30)
+            changeModetoHighAccuracy();
+        else if(location.getAccuracy() < 100) {
+            mCurrentLocation = location;
+            hapityPref.edit().putString("Lattitude", String.valueOf(mCurrentLocation.getLatitude())).putString("Longitude", String.valueOf(mCurrentLocation.getLongitude())).commit();
+//            Toast.makeText(this, getResources().getString(R.string.location_updated_message) + mCurrentLocation.getAccuracy() + " meters",
+//                    Toast.LENGTH_SHORT).show();
+//            sendMessage(Constants.MSG_LOCATION_CHANGED);
+
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    public void changeModetoHighAccuracy()
+    {
+
     }
 
     /* The click listner for ListView in the navigation drawer */
@@ -306,5 +397,12 @@ public class DashboardActivity extends ActionBarActivity {
     public static void dismissCustomProgress(){
         if(customProgressDialog.isShowing())
             customProgressDialog.dismiss();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+//        changeModetoHighAccuracy();
     }
 }

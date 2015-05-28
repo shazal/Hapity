@@ -251,8 +251,12 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             mClient.setServerAddress(ip, Integer.parseInt(port));
             mClient.setStreamPath("/" + path);
             mClient.startStream();
-
-            String url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=heloooo&geo_location=34,72&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+            String url =null;
+            if(DashboardActivity.hapityPref.getBoolean("shareLocation",false)){
+                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=heloooo&geo_location="+DashboardActivity.hapityPref.getString("Lattitude", "0")+","+DashboardActivity.hapityPref.getString("Longitude", "0")+"&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+            } else {
+                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=heloooo&geo_location=0,0&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+            }
 
             startBroadcast(url, null);
 

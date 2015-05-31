@@ -125,7 +125,7 @@ public class BrowseFragment extends Fragment {
                     for(int i = 0; i<bDetails.length; i++){
                         final BroadcastModal sched = new BroadcastModal();
                         sched.setUserName(bDetails[i].screen_name);
-                        sched.title=bDetails[i].title;
+                        sched.setTitle(bDetails[i].title);
                         sched.stream_url=bDetails[i].stream_url;
                         sched.id = bDetails[i].id;
                         sched.broadcast_image = bDetails[i].broadcast_image;

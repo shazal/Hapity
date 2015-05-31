@@ -12,7 +12,7 @@ public class BroadcastModal {
 	private String status = " Offline";
 	private String type = "";
 	public String id;
-	public String title;
+	private String title;
 	public String stream_url;
 	public String broadcast_image;
 
@@ -70,5 +70,12 @@ public class BroadcastModal {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }

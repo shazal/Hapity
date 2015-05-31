@@ -9,33 +9,37 @@
     <ImageView
         android:id="@+id/broadcastItem"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="400px"
         android:padding="0dip"
         android:scaleType="fitXY"
         android:src="@drawable/broadcast_dummy" />
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/nameText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Best Resturent in Europe (By John Doe)"
+        android:textSize="13sp"
+        android:textColor="@android:color/white"
         android:background="#99000000"
+        android:alpha="0.3"
+        />
+
+    <LinearLayout
+        android:id="@+id/broadcastItem_LL"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="bottom"
-        android:weightSum="6"
+        android:weightSum="5"
         android:orientation="horizontal"
         android:paddingBottom="1dp"
         android:paddingTop="1dp"
+        android:background="#99000000"
+
         >
 
-        <TextView
-            android:id="@+id/nameText"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="John Doe"
-            android:textSize="13sp"
-            android:textColor="@android:color/white"
 
-            />
         <TextView
             android:drawableLeft="@drawable/like"
             android:id="@+id/likeText"
@@ -45,7 +49,8 @@
             android:textColor="@android:color/white"
             android:text=" Like"
             android:textSize="11sp"
-
+            android:layout_marginBottom="3dp"
+            android:layout_marginTop="3dp"
             />
 
         <TextView
@@ -57,8 +62,9 @@
             android:textColor="@android:color/white"
             android:text=" Dislike"
             android:textSize="11sp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginTop="3dp"
             />
-
 
         <TextView
             android:drawableLeft="@drawable/comment"
@@ -71,7 +77,6 @@
             android:textSize="11sp"
             />
 
-
         <TextView
             android:drawableLeft="@drawable/share"
             android:id="@+id/shareText"
@@ -81,6 +86,8 @@
             android:textColor="@android:color/white"
             android:text=" Share"
             android:textSize="11sp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginTop="3dp"
             />
 
         <TextView
@@ -91,7 +98,8 @@
             android:textColor="@android:color/white"
             android:text="Offline"
             android:textSize="11sp"
-            android:background="#6EAA54"
+            android:background="@drawable/offline"
+            android:gravity="center"
             />
     </LinearLayout>
 

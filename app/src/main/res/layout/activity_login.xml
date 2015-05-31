@@ -59,13 +59,17 @@
                 android:textColor="@color/tw__solid_white"
                 />
 
-            <com.twitter.sdk.android.core.identity.TwitterLoginButton
+            <Button
                 android:id="@+id/twitter_login_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:background="@drawable/button2unselected"
-                android:layout_marginBottom="15dp"/>
+                android:layout_marginBottom="15dp"
+                android:text="Sign in with Twitter"
+                android:textColor="@color/tw__solid_white"
+                android:textStyle="bold"
+                />
 
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/fb_login_button"

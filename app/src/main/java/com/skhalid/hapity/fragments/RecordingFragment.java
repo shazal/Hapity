@@ -42,9 +42,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by skhalid on 5/23/2015.
- */
+
 public class RecordingFragment extends Fragment implements View.OnClickListener,
         RtspClient.Callback,
         Session.Callback,
@@ -70,6 +68,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     private ProgressBar mProgressBar;
     private Session mSession;
     private RtspClient mClient;
+    private String shareTitle;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +77,9 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 
         View rootView=  inflater.inflate(R.layout.main, null);
 
+
+        Bundle bundle = getArguments();
+        shareTitle = bundle.getString("ShareTitle");
 
         mButtonVideo = (Button) rootView.findViewById(R.id.video);
         mButtonSave = (Button) rootView.findViewById(R.id.save);
@@ -107,7 +109,8 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         mButtonFlash.setTag("off");
 
         SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (mPrefs.getString("uri", null) != null) mLayoutServerSettings.setVisibility(View.GONE);
+//        if (mPrefs.getString("uri", null) != null)
+            mLayoutServerSettings.setVisibility(View.GONE);
         mEditTextURI.setText(mPrefs.getString("uri", getString(R.string.default_stream)));
         mEditTextPassword.setText(mPrefs.getString("password", "abcd1234"));
         mEditTextUsername.setText(mPrefs.getString("username", "salmank888"));
@@ -253,9 +256,9 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             mClient.startStream();
             String url =null;
             if(DashboardActivity.hapityPref.getBoolean("shareLocation",false)){
-                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=heloooo&geo_location="+DashboardActivity.hapityPref.getString("Lattitude", "0")+","+DashboardActivity.hapityPref.getString("Longitude", "0")+"&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=" + shareTitle + "&geo_location="+DashboardActivity.hapityPref.getString("Lattitude", "0")+","+DashboardActivity.hapityPref.getString("Longitude", "0")+"&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
             } else {
-                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=heloooo&geo_location=0,0&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=" + shareTitle + "&geo_location=0,0&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
             }
 
             startBroadcast(url, null);
@@ -358,7 +361,6 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
@@ -388,7 +390,6 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
                 params,
                 startBroadcastSuccessListener(),
                 startBroadcastErrorListener());
-
 
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
@@ -424,7 +425,6 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
                 if(error.networkResponse.statusCode == 500){
                     Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                 }
-
 
             }
         };

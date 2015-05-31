@@ -5,8 +5,8 @@ import android.widget.ImageView;
 public class BroadcastModal {
 	
 	private String userName = "";
-	private String like = " Like";
-	private String dislike = " Dislike";
+	public String like = "";
+    public String dislike = "";
 	private String comment = " Coment";
 	private String share = " Share";
 	private String status = " Offline";

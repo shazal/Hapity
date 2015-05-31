@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.media.Image;
+import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -26,6 +27,8 @@ import com.skhalid.hapity.fragments.BroadcastFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
 import com.skhalid.hapity.fragments.ProfileFragment;
 
+import org.w3c.dom.Text;
+
 
 public class BroadcastListAdapter extends BaseAdapter implements OnClickListener {
 
@@ -34,6 +37,10 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
       private static LayoutInflater inflater=null;
       public Resources res;
       BroadcastModal tempValues=null;
+    View likeview;
+    int likepos = -1;
+    ViewHolder holder;
+    String liketype;
       int i=0;
       public BroadcastListAdapter(FragmentActivity a, ArrayList<BroadcastModal> d, Resources r) {
     	  this.activity = a;
@@ -77,25 +84,33 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
      }
 	@SuppressLint("InflateParams")
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		 View vi = convertView;
-         ViewHolder holder;
-        if(data.size() >0){
-         if(convertView==null) {
+
+        if(data.size() >0) {
+
              vi = inflater.inflate(R.layout.broadcast_list_item, null);
-             }
-
-
-
 
              holder = new ViewHolder();
              holder.braodcastItemBottomLayout = (LinearLayout) vi.findViewById(R.id.broadcastItem_LL);
              holder.name = (TextView) vi.findViewById(R.id.nameText);
+            holder.comment = (TextView) vi.findViewById(R.id.commentText);
+             holder.name.setOnClickListener(new OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
 
-            holder.like = (TextView) vi.findViewById(R.id.likeText);
+                 }
+             });
+
+
+
+             holder.like = (TextView) vi.findViewById(R.id.likeText);
             holder.like.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    liketype = "like";
+                    likeview = v;
+                    likepos = position;
                     DashboardActivity.showCustomProgress(activity, "", false);
                     String url = "http://testing.egenienext.com/project/hapity/webservice/like_broadcast?broadcast_id="+tempValues.id+"&user_id=" + DashboardActivity.hapityPref.getInt("userid",0);
                     GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
@@ -115,6 +130,9 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
             holder.dislike.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    liketype = "dislike";
+                    likeview = v;
+                    likepos = position;
                     DashboardActivity.showCustomProgress(activity, "", false);
                     String url = "http://testing.egenienext.com/project/hapity/webservice/dislike_broadcast?broadcast_id="+tempValues.id+"&user_id=" + DashboardActivity.hapityPref.getInt("userid",0);
                     GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
@@ -130,6 +148,30 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                     VolleySingleton.getInstance(activity).addToRequestQueue(myReq);
                 }
             });
+
+            holder.comment.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("bID", data.get(position).id );
+                    BroadcastFragment broadcastFragment = new BroadcastFragment();
+                    broadcastFragment.setArguments(bundle);
+                    FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.dash_container, broadcastFragment);
+                    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    transaction.addToBackStack("BroadcastFragment");
+//            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    transaction.commit();
+                }
+            });
+
+            if(data.get(position).like.equalsIgnoreCase("l")){
+                holder.like.setTextColor(activity.getResources().getColor(R.color.Yellow));
+            }
+
+            if(data.get(position).dislike.equalsIgnoreCase("l")){
+                holder.dislike.setTextColor(activity.getResources().getColor(R.color.Yellow));
+            }
 //             holder.userImage=(ImageView)vi.findViewById(R.id.userPhoto);
              holder.comment = (TextView) vi.findViewById(R.id.commentText);
              holder.share = (TextView) vi.findViewById(R.id.shareText);
@@ -138,8 +180,8 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
              tempValues = (BroadcastModal) data.get( position );
           
               holder.name.setText(tempValues.getTitle() + " (By "+ tempValues.getUserName() +")" );
-              holder.like.setText( tempValues.getLike() );
-              holder.dislike.setText(tempValues.getDislike() );
+              holder.like.setText( " like" );
+              holder.dislike.setText(" dislike" );
               holder.comment.setText(tempValues.getComment());
               holder.share.setText(tempValues.getShare());
 
@@ -167,13 +209,16 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
 		
 	}
 
-    public void performAction(int mPosition2) {
-
-        BroadcastFragment broadcastFragment = new BroadcastFragment();
+    public  void performAction(int mPosition2) {
+        Bundle bundle = new Bundle();
+        bundle.putString("bID", data.get(mPosition2).id );
+        bundle.putString("sURL", data.get(mPosition2).stream_url);
+        ProfileFragment profileFragment = new ProfileFragment();
+        profileFragment.setArguments(bundle);
         FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.dash_container, broadcastFragment);
+        transaction.replace(R.id.dash_container, profileFragment);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.addToBackStack("BraodcastFragment");
+        transaction.addToBackStack("ProfileFragment");
 //            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         transaction.commit();
 
@@ -185,6 +230,26 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                 try {
                     DashboardActivity.dismissCustomProgress();
                     Toast.makeText(activity, response.status, Toast.LENGTH_LONG).show();
+
+                    if(likeview != null){
+                        TextView vi = (TextView)likeview;
+                        vi.setTextColor(activity.getResources().getColor(R.color.Yellow));
+
+                        if(liketype.equalsIgnoreCase("like")){
+                            data.get(likepos).like = "l";
+                    } else {
+                            data.get(likepos).dislike = "l";
+                    }
+                        likeview = null;
+                        likepos = -1;
+
+                    }
+
+//                    if(liketype.equalsIgnoreCase("like")){
+//                        holder.like.setTextColor(activity.getResources().getColor(R.color.Yellow));
+//                    } else {
+//                        holder.dislike.setTextColor(activity.getResources().getColor(R.color.Yellow));
+//                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();

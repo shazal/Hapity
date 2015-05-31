@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,6 +48,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginBehavior;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.skhalid.hapity.DashboardActivity;
@@ -74,7 +76,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     private Button loginButton;
     CallbackManager callbackManager;
-    LoginButton fbLoginButton;
+    Button fbLoginButton;
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -153,8 +155,10 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mLoginFormView = getActivity().findViewById(R.id.login_form);
 
 
+       
+        fbLoginButton = (Button) getActivity().findViewById(R.id.fb_login_button);
         loginButton = (Button) getActivity().findViewById(R.id.twitter_login_button);
-        fbLoginButton = (LoginButton) getActivity().findViewById(R.id.fb_login_button);
+        
 
         mTwitterAuthClient= new TwitterAuthClient();
 
@@ -187,67 +191,83 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             }
         });
 
-        fbLoginButton.setReadPermissions("email");
-        fbLoginButton.setLoginBehavior(LoginBehavior.SSO_WITH_FALLBACK);
-        fbLoginButton.setFragment(this);
-        // If using in a fragment
-
         callbackManager = CallbackManager.Factory.create();
-        // Other app specific specialization
 
-        // Callback registration
-        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                // App code
-                try {
-                    DashboardActivity.showCustomProgress(getActivity(), "", false);
-                    type = "facebook_id";
 
-                    params = new HashMap<String,String>();
-                    GraphRequest request = GraphRequest.newMeRequest(
-                            loginResult.getAccessToken(),
-                            new GraphRequest.GraphJSONObjectCallback() {
-                                @Override
-                                public void onCompleted(
-                                        JSONObject object,
-                                        GraphResponse response) {
-                                    // Application code
-                                    try {
-                                        UserID = object.getString("id");
-                                        params.put(type, UserID);
-                                        String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
-                                        loadAPI(url, params);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                    Bundle parameters = new Bundle();
-                    parameters.putString("fields", "id,name,email,gender, birthday");
-                    request.setParameters(parameters);
-                    request.executeAsync();
+        LoginManager.getInstance().setLoginBehavior(LoginBehavior.SSO_WITH_FALLBACK);
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        try {
+                            DashboardActivity.showCustomProgress(getActivity(), "", false);
+                            type = "facebook_id";
+
+                            params = new HashMap<String, String>();
+                            GraphRequest request = GraphRequest.newMeRequest(
+                                    loginResult.getAccessToken(),
+                                    new GraphRequest.GraphJSONObjectCallback() {
+                                        @Override
+                                        public void onCompleted(
+                                                JSONObject object,
+                                                GraphResponse response) {
+                                            // Application code
+                                            try {
+                                                UserID = object.getString("id");
+                                                params.put(type, UserID);
+                                                String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
+                                                loadAPI(url, params);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    });
+                            Bundle parameters = new Bundle();
+                            parameters.putString("fields", "id,name,email,gender, birthday");
+                            request.setParameters(parameters);
+                            request.executeAsync();
 //                    Profile.fetchProfileForCurrentAccessToken();
 //                    UserID = Profile.getCurrentProfile().getId();
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
-            }
+                    }
 
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+
+                    }
+                });
+
+        fbLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCancel() {
-                // App code
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                // App code
-                exception.toString();
-                Toast.makeText(getActivity(),exception.toString(),Toast.LENGTH_LONG).show();
+            public void onClick(View view) {
+                LoginManager.getInstance().logInWithReadPermissions(getActivity(), Arrays.asList("public_profile", "user_friends"));
             }
         });
+
+        if(DashboardActivity.hapityPref.getString("loggedin","0").equalsIgnoreCase("1")) {
+            setFullscreen(false);
+            DashboardActivity.action_bar.show();
+            BottomFragment.isHomeActive = true;
+            BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
+            BroadcastListFragment twitsFragment = new BroadcastListFragment();
+            FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.dash_container, twitsFragment);
+
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                    transaction.addToBackStack("posts");
+//                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            transaction.commitAllowingStateLoss();
+            DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
+        }
     }
 
 
@@ -464,8 +484,10 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             @Override
             public void onResponse(Jsonexample response) {
                 try {
+
                     DashboardActivity.dismissCustomProgress();
                     DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
+                    DashboardActivity.hapityPref.edit().putString("loggedin", "1").commit();
                     setFullscreen(false);
                     DashboardActivity.action_bar.show();
                     BottomFragment.isHomeActive = true;
@@ -533,7 +555,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void onResponse(Jsonexample response) {
                 try {
                     DashboardActivity.dismissCustomProgress();
-
+                    DashboardActivity.hapityPref.edit().putString("loggedin","1").commit();
                     DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
                     setFullscreen(false);
                     DashboardActivity.action_bar.show();

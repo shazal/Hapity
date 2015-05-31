@@ -5,7 +5,10 @@ package com.skhalid.hapity;
  */
 public class Comments {
 
-    public Comments(){
-
-    }
+    public String comment_id;
+    public String user_id;
+    public String screen_name;
+    public String profile_picture;
+    public String comment;
+    public String date;
 }

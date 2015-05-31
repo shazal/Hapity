@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -67,16 +69,25 @@ public class ProfileFragment extends Fragment {
     RadioButton rb2;
     Button FollowButton;
     TextView Name;
+    EditText commentText;
+    ImageView sendimg;
 
     String userid="28";
+    String bID = "";
+    String sURL = "";
 
     FollowersInfo[] followers;
     FollowersInfo[] following;
     UserInfo1[] ProfileInfo;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile, container, false);
+        Bundle bundle = getArguments();
+        bID = bundle.getString("bID");
+        sURL = bundle.getString("sURL");
         SegmentedGroup segmented2 = (SegmentedGroup) rootView.findViewById(R.id.segmented2);
         segmented2.setTintColor(Color.parseColor("#554979"));
         myVideoView = (VideoView) rootView.findViewById(R.id.video_view1);
@@ -88,14 +99,16 @@ public class ProfileFragment extends Fragment {
         rb2 = (RadioButton) rootView.findViewById(R.id.button22);
         myVideoView.setEnabled(true);
         overlayLL.setVisibility(View.GONE);
-        Bundle bundle = this.getArguments();
-//         userid = bundle.getString("userid", "0");
         FollowButton = (Button) rootView.findViewById(R.id.Followbtn);
         Name = (TextView) rootView.findViewById(R.id.user_name);
 
+        commentText = (EditText) rootView.findViewById(R.id.writeComment);
+        sendimg = (ImageView) rootView.findViewById(R.id.sendimg);
         return rootView;
 
     }
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -150,7 +163,7 @@ public class ProfileFragment extends Fragment {
         rb1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i =0; i < followers.length; i++) {
+                for (int i = 0; i < followers.length; i++) {
                     usersArray.add(followers[i]);
                 }
 
@@ -163,7 +176,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 usersArray.clear();
-                for(int i =0; i < following.length; i++) {
+                for (int i = 0; i < following.length; i++) {
                     usersArray.add(following[i]);
                 }
 
@@ -176,22 +189,16 @@ public class ProfileFragment extends Fragment {
         usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ProfileFragment profileFragment = new ProfileFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.dash_container, profileFragment);
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                transaction.addToBackStack("Profile89++Fragment");
-                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                transaction.commit();
+
             }
         });
 
         FollowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(FollowButton.getText().toString().equalsIgnoreCase("UnFollow")){
+                if (FollowButton.getText().toString().equalsIgnoreCase("UnFollow")) {
                     DashboardActivity.showCustomProgress(getActivity(), "", false);
-                    String url = "http://testing.egenienext.com/project/hapity/webservice/unfollow_user?follower_id="+DashboardActivity.hapityPref.getInt("userid",0)+"&following_id=" + userid;
+                    String url = "http://testing.egenienext.com/project/hapity/webservice/unfollow_user?follower_id=" + DashboardActivity.hapityPref.getInt("userid", 0) + "&following_id=" + userid;
                     GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
                             Request.Method.GET,
                             url,
@@ -205,7 +212,7 @@ public class ProfileFragment extends Fragment {
                     VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
                 } else {
                     DashboardActivity.showCustomProgress(getActivity(), "", false);
-                    String url = "http://testing.egenienext.com/project/hapity/webservice/follow_user?follower_id="+DashboardActivity.hapityPref.getInt("userid",0)+"&following_id=" + userid;
+                    String url = "http://testing.egenienext.com/project/hapity/webservice/follow_user?follower_id=" + DashboardActivity.hapityPref.getInt("userid", 0) + "&following_id=" + userid;
                     GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
                             Request.Method.GET,
                             url,
@@ -219,6 +226,26 @@ public class ProfileFragment extends Fragment {
                     VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
 
                 }
+            }
+        });
+
+        sendimg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DashboardActivity.showCustomProgress(getActivity(), "", false);
+                String url = "http://testing.egenienext.com/project/hapity/webservice/post_comment?user_id=" + DashboardActivity.hapityPref.getInt("userid", 0) + "&broadcast_id=" + bID + "&comment=" + commentText.getText().toString();
+                GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                        Request.Method.GET,
+                        url,
+                        Jsonexample.class,
+                        null,
+                        null,
+                        createMyReqSuccessListenerComment(),
+                        createMyReqErrorListenerComment());
+
+
+                VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
             }
         });
 
@@ -309,6 +336,34 @@ public class ProfileFragment extends Fragment {
     }
 
     private Response.ErrorListener createMyReqErrorListenerFUF() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                int statuscode = error.networkResponse.statusCode;
+                DashboardActivity.dismissCustomProgress();
+                Toast.makeText(getActivity(), "Some Problem With Web Service", Toast.LENGTH_LONG).show();
+
+
+            }
+        };
+    }
+
+    private Response.Listener<Jsonexample> createMyReqSuccessListenerComment() {
+        return new Response.Listener<Jsonexample>() {
+            @Override
+            public void onResponse(Jsonexample response) {
+                try {
+                    DashboardActivity.dismissCustomProgress();
+                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_LONG).show();
+                    commentText.setText("");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        };
+    }
+
+    private Response.ErrorListener createMyReqErrorListenerComment() {
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {

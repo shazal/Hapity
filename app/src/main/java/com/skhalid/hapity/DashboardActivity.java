@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -80,6 +81,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
     public static SharedPreferences hapityPref;
     public static final String PREFS_NAME = "HapityPreferences";
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +110,8 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
         setFullscreen(true);
         setContentView(R.layout.activity_dashboard);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         action_bar = getSupportActionBar();
         action_bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#6EAA54")));
@@ -371,8 +375,21 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        LoginManager.getInstance().logOut();
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
 
     public static void showCustomProgress(final Context context, String Msg, Boolean isCancelable) {

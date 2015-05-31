@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class ShareBroadcast extends Fragment {
 
         View rootView = inflater.inflate(R.layout.share_broadcast, container, false);
 
+        final EditText shareTitle = (EditText) rootView.findViewById(R.id.share_title);
         ImageButton startRecordingBtn = (ImageButton) rootView.findViewById(R.id.startBroadcastBtn);
         CheckBox shareLocation = (CheckBox) rootView.findViewById(R.id.radio_button_share);
 
@@ -44,7 +46,10 @@ public class ShareBroadcast extends Fragment {
             @Override
             public void onClick(View v) {
 
+                Bundle bundle = new Bundle();
+                bundle.putString("ShareTitle", shareTitle.getText().toString());
                 RecordingFragment recordingFragment = new RecordingFragment();
+                recordingFragment.setArguments(bundle);
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.dash_container, recordingFragment);
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

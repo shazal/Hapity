@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,7 +53,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
 	@Override
 	public Object getItem(int position) {
 		// TODO Auto-generated method stub
-		return position;
+		return this.data.get(position);
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
          public TextView share;
          public TextView type;
          public ImageView broadcastImage;
-        // public ImageView dreamImage;
+         public LinearLayout braodcastItemBottomLayout;
          
   
      }
@@ -88,23 +89,10 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
 
 
              holder = new ViewHolder();
+             holder.braodcastItemBottomLayout = (LinearLayout) vi.findViewById(R.id.broadcastItem_LL);
              holder.name = (TextView) vi.findViewById(R.id.nameText);
-             holder.name.setOnClickListener(new OnClickListener() {
-                 @Override
-                 public void onClick(View v) {
 
-                     ProfileFragment profileFragment = new ProfileFragment();
-                     FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-                     transaction.replace(R.id.dash_container, profileFragment);
-                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                     transaction.addToBackStack("Profile89++Fragment");
-//                     activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                     transaction.commit();
-
-                 }
-             });
-
-             holder.like = (TextView) vi.findViewById(R.id.likeText);
+            holder.like = (TextView) vi.findViewById(R.id.likeText);
             holder.like.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -149,7 +137,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
              tempValues=null;
              tempValues = (BroadcastModal) data.get( position );
           
-              holder.name.setText(tempValues.getUserName() );
+              holder.name.setText(tempValues.getTitle() + " (By "+ tempValues.getUserName() +")" );
               holder.like.setText( tempValues.getLike() );
               holder.dislike.setText(tempValues.getDislike() );
               holder.comment.setText(tempValues.getComment());
@@ -179,7 +167,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
 		
 	}
 
-    public  void performAction(int mPosition2) {
+    public void performAction(int mPosition2) {
 
         BroadcastFragment broadcastFragment = new BroadcastFragment();
         FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();

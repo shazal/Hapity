@@ -95,7 +95,7 @@
         android:background="#99000000"
         android:orientation="vertical"
         android:weightSum="10"
-        android:visibility="gone"
+
         android:id="@+id/overlay_LL">
         <!--android:visibility="gone"-->
 
@@ -103,7 +103,7 @@
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_gravity="center"
-            android:layout_weight="1.5"
+            android:layout_weight="2"
             android:src="@drawable/background"
             android:id="@+id/dp"
             android:layout_marginTop="15dp"/>
@@ -126,9 +126,9 @@
             android:layout_weight="1"
             android:layout_margin="3dp"
             android:orientation="horizontal"
-            android:layout_gravity="center"
             segmentedgroup:border_width="2dp"
-            segmentedgroup:corner_radius="20dp">
+            segmentedgroup:corner_radius="20dp"
+            android:layout_gravity="center">
 
             <RadioButton
                 android:id="@+id/button21"
@@ -150,7 +150,7 @@
             android:id="@+id/listView2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4.5"
+            android:layout_weight="5"
             android:layout_gravity="center">
 
         </ListView>
@@ -158,15 +158,17 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="3.25">
+            android:layout_weight="1.25"
+            android:gravity="center">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+
             android:id="@+id/Followbtn"
             android:text="Follow"
             android:textColor="@color/tw__solid_white"
-            android:background="@drawable/button4unselected"/>
+            android:background="@drawable/button4unselected"
+            android:layout_gravity="center" />
         </LinearLayout>
 
     </LinearLayout>

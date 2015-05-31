@@ -58,6 +58,7 @@ import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import org.json.JSONException;
@@ -71,7 +72,7 @@ import static android.view.View.getDefaultSize;
  */
 public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
-    private TwitterLoginButton loginButton;
+    private Button loginButton;
     CallbackManager callbackManager;
     LoginButton fbLoginButton;
     /**
@@ -95,6 +96,8 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     HashMap<String, String> params;
     public static SharedPreferences pref;
     public static final String PREFS_NAME = "MyPrefsFile";
+    private TwitterAuthClient mTwitterAuthClient;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -150,31 +153,37 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mLoginFormView = getActivity().findViewById(R.id.login_form);
 
 
-        loginButton = (TwitterLoginButton) getActivity().findViewById(R.id.twitter_login_button);
+        loginButton = (Button) getActivity().findViewById(R.id.twitter_login_button);
         fbLoginButton = (LoginButton) getActivity().findViewById(R.id.fb_login_button);
 
-        loginButton.setCallback(new Callback<TwitterSession>() {
-            @Override
-            public void success(Result<TwitterSession> result) {
-                // Do something with result, which provides a TwitterSession for making API calls
-                try {
-                    DashboardActivity.showCustomProgress(getActivity(), "", false);
-                    type = "twitter";
-                    String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
-                     params = new HashMap<String,String>();
-                    UserID = result.data.getUserId() + "";
-                    params.put("twitter_id", UserID);
-                    loadAPI(url, params);
+        mTwitterAuthClient= new TwitterAuthClient();
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
+        loginButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void failure(TwitterException exception) {
-                // Do something on failure
+            public void onClick(View v) {
+
+
+                mTwitterAuthClient.authorize(getActivity(), new com.twitter.sdk.android.core.Callback<TwitterSession>() {
+
+                    @Override
+                    public void success(Result<TwitterSession> twitterSessionResult) {
+                        DashboardActivity.showCustomProgress(getActivity(), "", false);
+                        type = "twitter";
+                        String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
+                        params = new HashMap<String,String>();
+                        UserID = twitterSessionResult.data.getUserId() + "";
+                        params.put("twitter_id", UserID);
+                        loadAPI(url, params);
+                    }
+
+                    @Override
+                    public void failure(TwitterException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+
             }
         });
 
@@ -249,7 +258,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         if(requestCode == 195278 || requestCode == 64206) {
             callbackManager.onActivityResult(requestCode, resultCode, data);
         } else {
-            loginButton.onActivityResult(requestCode, resultCode, data);
+            mTwitterAuthClient.onActivityResult(requestCode, resultCode, data);
         }
     }
 

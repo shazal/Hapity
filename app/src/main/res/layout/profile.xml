@@ -14,7 +14,7 @@
             android:id="@+id/video1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7"
+            android:layout_weight="8.7"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="15dp">
@@ -44,7 +44,7 @@
         android:textSize="15sp"
         android:layout_marginRight="15dp"
         android:id="@+id/view_profile"
-        android:layout_weight="0.8"
+        android:layout_weight="0.5"
         android:layout_marginTop="10dp"
         />
 
@@ -56,15 +56,37 @@
         android:id="@+id/line_image"
         android:layout_weight="0.05"/>
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:textSize="15sp"
-        android:text="dummy line"
-        android:textColor="@color/tw__solid_white"
-        android:id="@+id/description"
-        android:layout_weight="2.15"
-        android:layout_marginTop="10dp"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.75"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:textSize="15sp"
+                android:hint="Type Your Comment"
+                android:textColorHint="@color/tw__solid_white"
+                android:textColor="@color/tw__solid_white"
+                android:id="@+id/writeComment"
+                android:layout_weight="0.8"
+                android:background="@null"/>
+
+            <ImageView
+
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:src = "@drawable/send"
+                android:textColor="@color/tw__solid_white"
+                android:id="@+id/sendimg"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
+
+
     </LinearLayout>
 
     <LinearLayout

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.skhalid.hapity.fragments.ProfileFragment;
 
@@ -56,28 +57,26 @@ public class CommentsAdapter extends ArrayAdapter<Comments> {
             arg1 = inflater.inflate(R.layout.listitem, arg2,false);
         }
 
-        RoundedImageView roundedImageView = new RoundedImageView(context);
-        ImageView imagep = (ImageView) arg1.findViewById(R.id.imageView1);
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.lums);
-        Bitmap resized = Bitmap.createScaledBitmap(icon, 150, 150, true);
-        resized = roundedImageView.getCroppedBitmap(resized, 150);
-        imagep.setImageBitmap(resized);
+        if(comments.size() > 0) {
+            RoundedImageView roundedImageView = new RoundedImageView(context);
+            ImageView imagep = (ImageView) arg1.findViewById(R.id.imageView1);
+            Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                    R.drawable.lums);
+            Bitmap resized = Bitmap.createScaledBitmap(icon, 150, 150, true);
+            resized = roundedImageView.getCroppedBitmap(resized, 150);
+            imagep.setImageBitmap(resized);
 
-        imagep.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ProfileFragment profileFragment = new ProfileFragment();
-                FragmentTransaction transaction = context.getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.dash_container, profileFragment);
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                transaction.addToBackStack("Profile89++Fragment");
-                context.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                transaction.commit();
-            }
-        });
+            imagep.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                }
+            });
 
+            TextView text = (TextView) arg1.findViewById(R.id.commenttextview);
+            text.setText(comments.get(arg0).comment);
+
+        }
         return arg1;
     }
 

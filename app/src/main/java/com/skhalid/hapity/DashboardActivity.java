@@ -81,6 +81,9 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
     public static SharedPreferences hapityPref;
     public static final String PREFS_NAME = "HapityPreferences";
+
+    public static String pfBID;
+    public static String pfSURL;
     private boolean doubleBackToExitPressedOnce = false;
 
     @Override
@@ -120,6 +123,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
         bottom_fragment =  getSupportFragmentManager().findFragmentById(R.id.bottom_fragment);
         bottom_fragment.getView().setVisibility(View.INVISIBLE);
 
+
         login = new LoginFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.dash_container, login);
@@ -145,7 +149,6 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
         navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
-        navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 
 
 
@@ -327,7 +330,31 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
     private void selectItem(int position) {
         // update the main content by replacing fragments
 
+        switch (position){
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                LoginManager.getInstance().logOut();
+                hapityPref.edit().putString("loggedin","0").commit();
+                action_bar.hide();
 
+                bottom_fragment =  getSupportFragmentManager().findFragmentById(R.id.bottom_fragment);
+                bottom_fragment.getView().setVisibility(View.INVISIBLE);
+
+
+                login = new LoginFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.dash_container, login);
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//		transaction.addToBackStack("login");
+//      getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                transaction.commit();
+                break;
+        }
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
 //        setTitle(mPlanetTitles[position]);

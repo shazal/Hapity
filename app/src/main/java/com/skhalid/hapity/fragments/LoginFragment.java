@@ -513,10 +513,11 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                int statuscode = error.networkResponse.statusCode;
+                if (error.networkResponse != null){
+                    int statuscode = error.networkResponse.statusCode;
 
-                if(statuscode == 500){
-                    if(type.equalsIgnoreCase("manual")) {
+                if (statuscode == 500) {
+                    if (type.equalsIgnoreCase("manual")) {
                         DashboardActivity.dismissCustomProgress();
                         Toast.makeText(getActivity(), "User Not Found/Server Error", Toast.LENGTH_LONG).show();
                     } else {
@@ -526,7 +527,10 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                     }
                 }
 
-
+            } else {
+                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
+                    DashboardActivity.dismissCustomProgress();
+                }
             }
         };
     }
@@ -583,12 +587,15 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             @Override
             public void onErrorResponse(VolleyError error) {
                 DashboardActivity.dismissCustomProgress();
-                int statuscode = error.networkResponse.statusCode;
+                if (error.networkResponse != null){
+                    int statuscode = error.networkResponse.statusCode;
 
-                if(statuscode == 404){
+                if (statuscode == 404) {
                     Toast.makeText(getActivity(), "Some Error Occured", Toast.LENGTH_LONG);
                 }
-
+            } else {
+                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
+                }
 
             }
         };

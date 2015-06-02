@@ -262,11 +262,15 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
         return new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                int statuscode = error.networkResponse.statusCode;
                 DashboardActivity.dismissCustomProgress();
-                Toast.makeText(activity, "Some Problem With Web Service", Toast.LENGTH_LONG).show();
+                if (error.networkResponse!=null) {
+                    int statuscode = error.networkResponse.statusCode;
 
+                    Toast.makeText(activity, "Some Problem With Web Service", Toast.LENGTH_LONG).show();
 
+                }else {
+                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
+                }
             }
         };
     }

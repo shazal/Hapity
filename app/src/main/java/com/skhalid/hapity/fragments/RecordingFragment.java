@@ -422,10 +422,13 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 
                 DashboardActivity.dismissCustomProgress();
 
-                if(error.networkResponse.statusCode == 500){
-                    Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                if (error.networkResponse!=null) {
+                    if (error.networkResponse.statusCode == 500) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
                 }
-
             }
         };
     }

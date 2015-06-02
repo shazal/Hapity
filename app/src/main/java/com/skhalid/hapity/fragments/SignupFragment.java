@@ -219,13 +219,16 @@ public class SignupFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 DashboardActivity.dismissCustomProgress();
+                if (error.networkResponse != null){
                 int statuscode = error.networkResponse.statusCode;
 
-                if(statuscode == 404){
+                if (statuscode == 404) {
                     Toast.makeText(getActivity(), "user already exist", Toast.LENGTH_LONG).show();
                 }
 
-
+            }else {
+                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
+                }
             }
         };
     }

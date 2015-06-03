@@ -76,7 +76,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 					transaction.replace(R.id.dash_container, browseFragment);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("browse");
-//                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					transaction.commit();
 
 				} catch (Exception e) {
@@ -106,7 +106,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 					transaction.replace(R.id.dash_container, myListsFragment);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("profile");
-//					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					transaction.commit();
 
 				} catch (Exception e) {
@@ -134,7 +134,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 					transaction.replace(R.id.dash_container, shareBroadcast);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("share");
-//					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					transaction.commit();
 
 				} catch (Exception e) {
@@ -165,7 +165,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 					transaction.replace(R.id.dash_container, broadcastListFragment);
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("posts");
-//					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 					transaction.commit();
 
 				} catch (Exception e) {

@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/broadcastItem"
         android:layout_width="fill_parent"
-        android:layout_height="400px"
+        android:layout_height="200dp"
         android:padding="0dip"
         android:scaleType="fitXY"
         android:src="@drawable/broadcast_dummy" />

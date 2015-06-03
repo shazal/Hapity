@@ -5,8 +5,8 @@
     >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="10">
 
@@ -20,7 +20,7 @@
             android:layout_marginTop="15dp">
 
 
-            <VideoView
+  <!--          <VideoView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/video_view1"
@@ -30,10 +30,59 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentTop="true"/>
+                -->
+                    <io.vov.vitamio.widget.VideoView
+                        android:id="@+id/buffer"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentTop="true"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="horizontal" >
+
+                    <ProgressBar
+                        android:id="@+id/probar"
+                        style="?android:attr/progressBarStyleLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/download_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/tw__solid_white"
+                        android:text="" />
+
+                    <TextView
+                        android:id="@+id/load_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textColor="@color/tw__solid_white"
+                        android:text="" />
+                    <ImageButton
+                        android:id="@+id/play_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:src="@drawable/play"
+                        android:visibility="gone"
+                        />
+                </LinearLayout>
+
+
+            </RelativeLayout>
 
 
 
-        </RelativeLayout>
 
     <TextView
         android:layout_width="fill_parent"

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -32,11 +33,16 @@ import com.skhalid.hapity.VolleySingleton;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import it.carlom.stikkyheader.core.StikkyHeaderBuilder;
+import it.carlom.stikkyheader.core.animator.AnimatorBuilder;
+import it.carlom.stikkyheader.core.animator.HeaderStikkyAnimator;
+
 public class BroadcastFragment extends Fragment {
 	ArrayList<Comments> commentsArray;
 	CommentsAdapter commentAdapter ;
 	ListView commentsList;
-    private VideoView myVideoView;
+//    private VideoView myVideoView;
+    private ImageView myImageView;
     private int position = 0;
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
@@ -51,35 +57,9 @@ public class BroadcastFragment extends Fragment {
         Bundle bundle = getArguments();
         bID = bundle.getString("bID");
 		commentsList = (ListView) rootView.findViewById(R.id.listView1);
-        myVideoView = (VideoView) rootView.findViewById(R.id.video_view);
-        if (mediaControls == null) {
-            mediaControls = new MediaController(getActivity());
-        }
-        try {
-            myVideoView.setMediaController(mediaControls);
-            myVideoView.setVideoURI(Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.example));
+        myImageView = (ImageView) rootView.findViewById(R.id.header_image);
 
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-        }
 
-        myVideoView.requestFocus();
-        myVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
-            public void onPrepared(MediaPlayer mp) {
-                //progressDialog.dismiss();
-                myVideoView.seekTo(position);
-                if (position == 0) {
-                    myVideoView.pause();
-                } else {
-                    myVideoView.pause();
-                }
-            }
-        });
-        commentsArray = new ArrayList<Comments>();
-        String url = "http://testing.egenienext.com/project/hapity/webservice/get_comments?broadcast_id=" + bID;
-        loadAPI(url,null);
        return rootView;
        
     }
@@ -87,6 +67,15 @@ public class BroadcastFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+
+        StikkyHeaderBuilder.stickTo(commentsList)
+                .setHeader(R.id.header, (ViewGroup) getView())
+                .minHeightHeaderDim(R.dimen.min_header)
+                .animator(new ParallaxStikkyAnimator())
+                .build();
+        commentsArray = new ArrayList<Comments>();
+        String url = "http://testing.egenienext.com/project/hapity/webservice/get_comments?broadcast_id=" + bID;
+        loadAPI(url, null);
 	}
     
     @Override
@@ -160,4 +149,14 @@ public class BroadcastFragment extends Fragment {
         };
     }
 
+
+    private class ParallaxStikkyAnimator extends HeaderStikkyAnimator {
+
+        @Override
+        public AnimatorBuilder getAnimatorBuilder() {
+            View mHeader_image = getHeader().findViewById(R.id.header_image);
+
+            return AnimatorBuilder.create().applyVerticalParallax(mHeader_image);
+        }
+    }
 }

@@ -269,7 +269,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                     Toast.makeText(activity, "Some Problem With Web Service", Toast.LENGTH_LONG).show();
 
                 }else {
-                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, "Some Problem With Network", Toast.LENGTH_LONG).show();
                 }
             }
         };

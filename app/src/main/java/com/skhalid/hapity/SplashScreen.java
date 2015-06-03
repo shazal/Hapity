@@ -16,8 +16,8 @@ import io.fabric.sdk.android.Fabric;
 public class SplashScreen extends Activity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "UUZdCKZznj6Hq5eA1w5poy5i9";
-    private static final String TWITTER_SECRET = "YrhndnbiSNTDk3uxp98fGnURfWjkHMEujW4QG4Zv6PCaId4Znz";
+    private static final String TWITTER_KEY = "GtW6VeWGM7c88N0T0LHytmEr1";
+    private static final String TWITTER_SECRET = "kFINkXwfQnxYEizIZ8vHjDDNQmOOrLLk7VtbStkfQ2iA1Qfwdh";
 
 
     @Override

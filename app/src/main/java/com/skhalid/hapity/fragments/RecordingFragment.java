@@ -112,8 +112,8 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 //        if (mPrefs.getString("uri", null) != null)
             mLayoutServerSettings.setVisibility(View.GONE);
         mEditTextURI.setText(mPrefs.getString("uri", getString(R.string.default_stream)));
-        mEditTextPassword.setText(mPrefs.getString("password", "abcd1234"));
-        mEditTextUsername.setText(mPrefs.getString("username", "salmank888"));
+        mEditTextPassword.setText(mPrefs.getString("password", "wozpubuser"));
+        mEditTextUsername.setText(mPrefs.getString("username", "Pu8Eg3n3_"));
 
         // Configures the SessionBuilder
         mSession = SessionBuilder.getInstance()

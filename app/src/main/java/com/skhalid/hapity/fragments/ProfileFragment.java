@@ -15,15 +15,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -51,11 +54,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import info.hoang8f.android.segmented.SegmentedGroup;
+import io.vov.vitamio.LibsChecker;
 
 import static android.view.View.VISIBLE;
 
-public class ProfileFragment extends Fragment {
-    private VideoView myVideoView;
+public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPlayer.OnInfoListener, io.vov.vitamio.MediaPlayer.OnBufferingUpdateListener {
     private int position = 0;
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
@@ -80,24 +83,53 @@ public class ProfileFragment extends Fragment {
     FollowersInfo[] following;
     UserInfo1[] ProfileInfo;
 
+    private String path = "https://ia700401.us.archive.org/19/items/ksnn_compilation_master_the_internet/ksnn_compilation_master_the_internet_512kb.mp4";
+    private Uri uri;
+    private io.vov.vitamio.widget.VideoView mVideoView;
+    private ProgressBar pb;
+    private TextView downloadRateView, loadRateView;
+    private  io.vov.vitamio.widget.MediaController mc;
+    private ImageButton mPlayButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.profile, container, false);
         Bundle bundle = getArguments();
         bID = bundle.getString("bID");
         sURL = bundle.getString("sURL");
         SegmentedGroup segmented2 = (SegmentedGroup) rootView.findViewById(R.id.segmented2);
         segmented2.setTintColor(Color.parseColor("#554979"));
-        myVideoView = (VideoView) rootView.findViewById(R.id.video_view1);
+
+        mVideoView = (io.vov.vitamio.widget.VideoView) rootView.findViewById(R.id.buffer);
+        pb = (ProgressBar) rootView.findViewById(R.id.probar);
+
+        downloadRateView = (TextView) rootView.findViewById(R.id.download_rate);
+        loadRateView = (TextView) rootView.findViewById(R.id.load_rate);
+
+
+        // Setup a play button to start the video
+        mPlayButton = (ImageButton) rootView.findViewById(R.id.play_button);
+        mPlayButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                    mVideoView.start();
+                    // hide button once playback starts
+                    mPlayButton.setVisibility(View.GONE);
+
+            }
+        });
+
         imagep = (ImageView) rootView.findViewById(R.id.dp);
         viewProfile = (TextView) rootView.findViewById(R.id.view_profile);
         overlayLL = (LinearLayout) rootView.findViewById(R.id.overlay_LL);
         usersList = (ListView) rootView.findViewById(R.id.listView2);
          rb1 = (RadioButton) rootView.findViewById(R.id.button21);
         rb2 = (RadioButton) rootView.findViewById(R.id.button22);
-        myVideoView.setEnabled(true);
+//        myVideoView.setEnabled(true);
         overlayLL.setVisibility(View.GONE);
         FollowButton = (Button) rootView.findViewById(R.id.Followbtn);
         Name = (TextView) rootView.findViewById(R.id.user_name);
@@ -114,6 +146,35 @@ public class ProfileFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        if (LibsChecker.checkVitamioLibs(getActivity())) {
+            uri = Uri.parse(path);
+            mVideoView.setVideoURI(uri);
+            mVideoView.requestFocus();
+            mVideoView.setOnInfoListener(this);
+            mVideoView.setOnBufferingUpdateListener(this);
+            mVideoView.setOnPreparedListener(new io.vov.vitamio.MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(io.vov.vitamio.MediaPlayer mediaPlayer) {
+                    // optional need Vitamio 4.0
+                    mediaPlayer.setPlaybackSpeed(1.0f);
+
+                }
+            });
+
+            mVideoView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    if (mVideoView.isPlaying()) {
+                        mVideoView.pause();
+                        mPlayButton.setVisibility(View.VISIBLE);
+                    }
+
+                    return false;
+                }
+            });
+        }
+
         String url = "http://testing.egenienext.com/project/hapity/webservice/get_profile_info?user_id=" +userid ;
         loadAPI(url, null);
 
@@ -125,37 +186,15 @@ public class ProfileFragment extends Fragment {
         resized = roundedImageView.getCroppedBitmap(resized, 150);
         imagep.setImageBitmap(resized);
 
-        if (mediaControls == null) {
-            mediaControls = new MediaController(getActivity());
-        }
-        try {
-            myVideoView.setMediaController(mediaControls);
-            myVideoView.setVideoURI(Uri.parse("android.resource://" + getActivity().getPackageName() + "/" + R.raw.example));
 
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-        }
 
-        myVideoView.requestFocus();
-        myVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
-            public void onPrepared(MediaPlayer mp) {
-                //progressDialog.dismiss();
-                myVideoView.seekTo(position);
-                if (position == 0) {
-                    myVideoView.pause();
-                } else {
-                    myVideoView.pause();
-                }
-            }
-        });
+
 
         viewProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 overlayLL.setVisibility(View.VISIBLE);
-                myVideoView.setMediaController(null);
+//                myVideoView.setMediaController(null);
                 rb1.setChecked(true);
             }
         });
@@ -386,4 +425,36 @@ public class ProfileFragment extends Fragment {
         };
     }
 
+    @Override
+    public void onBufferingUpdate(io.vov.vitamio.MediaPlayer mp, int percent) {
+        loadRateView.setText(percent + "%");
+
+    }
+
+    @Override
+    public boolean onInfo(io.vov.vitamio.MediaPlayer mp, int what, int extra) {
+        switch (what) {
+            case io.vov.vitamio.MediaPlayer.MEDIA_INFO_BUFFERING_START:
+                if (mVideoView.isPlaying()) {
+                    mVideoView.pause();
+                    pb.setVisibility(View.VISIBLE);
+                    downloadRateView.setText("");
+                    loadRateView.setText("");
+                    downloadRateView.setVisibility(View.VISIBLE);
+                    loadRateView.setVisibility(View.VISIBLE);
+
+                }
+                break;
+            case io.vov.vitamio.MediaPlayer.MEDIA_INFO_BUFFERING_END:
+                mVideoView.start();
+                pb.setVisibility(View.GONE);
+                downloadRateView.setVisibility(View.GONE);
+                loadRateView.setVisibility(View.GONE);
+                break;
+            case io.vov.vitamio.MediaPlayer.MEDIA_INFO_DOWNLOAD_RATE_CHANGED:
+                downloadRateView.setText("" + extra + "kb/s" + "  ");
+                break;
+        }
+        return true;
+    }
 }

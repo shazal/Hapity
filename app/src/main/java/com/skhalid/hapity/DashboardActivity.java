@@ -25,6 +25,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -46,7 +47,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.skhalid.hapity.fragments.BottomFragment;
+import com.skhalid.hapity.fragments.BroadcastListFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
+import com.skhalid.hapity.fragments.MyListsFragment;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -64,9 +67,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-    private String[] mPlanetTitles;
 
     private String[] navMenuTitles;
     private TypedArray navMenuIcons;
@@ -161,12 +162,6 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
 
-//        mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
-//        mTitle = mDrawerTitle = getTitle();
-//        mPlanetTitles = getResources().getStringArray(R.array.menu_array);
-//        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 //        // set up the drawer's list view with items and click listener
@@ -200,6 +195,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         buildGoogleApiClient();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -332,14 +328,66 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
         switch (position){
             case 0:
+                if(!BottomFragment.isHomeActive)
+                {
+
+                    try {
+
+                        BottomFragment.isHomeActive = true;
+                        BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
+                        BottomFragment.isTypesActive = false;
+                        BottomFragment.topics_btn.setImageDrawable(getResources().getDrawable(R.drawable.browse_normal));
+                        BottomFragment.isAlertActive = false;
+                        BottomFragment.alertButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_normal));
+                        BottomFragment.isMyListsActive = false;
+                        BottomFragment.profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_normal));
+
+                        BroadcastListFragment broadcastListFragment = new BroadcastListFragment();
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.dash_container, broadcastListFragment);
+                        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//					transaction.addToBackStack("posts");
+                        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        transaction.commit();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
                 break;
             case 1:
+                if(!BottomFragment.isMyListsActive)
+                {
+                    try {
+                        BottomFragment.isHomeActive = false;
+                        BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_normal));
+                        BottomFragment.isTypesActive = false;
+                        BottomFragment.topics_btn.setImageDrawable(getResources().getDrawable(R.drawable.browse_normal));
+                        BottomFragment.isAlertActive = false;
+                        BottomFragment.alertButton.setImageDrawable(getResources().getDrawable(R.drawable.camera_normal));
+                        BottomFragment.isMyListsActive = true;
+                        BottomFragment.profileButton.setImageDrawable(getResources().getDrawable(R.drawable.mylist_pressed));
+
+                        MyListsFragment myListsFragment = new MyListsFragment();
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.dash_container, myListsFragment);
+                        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//					transaction.addToBackStack("profile");
+                        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        transaction.commit();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
                 break;
             case 2:
                 break;
             case 3:
                 LoginManager.getInstance().logOut();
-                hapityPref.edit().putString("loggedin","0").commit();
+                hapityPref.edit().putString("loggedin", "0").commit();
                 action_bar.hide();
 
                 bottom_fragment =  getSupportFragmentManager().findFragmentById(R.id.bottom_fragment);
@@ -351,7 +399,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
                 transaction.replace(R.id.dash_container, login);
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //		transaction.addToBackStack("login");
-//      getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 transaction.commit();
                 break;
         }

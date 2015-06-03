@@ -40,5 +40,5 @@
     <string name="password_hint">Leave empty if not needed</string>
     <string name="username_hint">Leave empty if not needed</string>
     <string name="default_bitrate">0 kbps</string>
-    <string name="default_stream">rtsp://54.76.206.227:1935/hapity/test.stream</string>
+    <string name="default_stream">rtsp://54.76.206.227:1935/live/test.stream</string>
 </resources>

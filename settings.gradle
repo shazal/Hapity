@@ -1,1 +1,1 @@
-include ':libstreaming', ':app', ':facebook', ':vitamio'
+include ':libstreaming', ':app', ':facebook', ':vitamio', ':core'

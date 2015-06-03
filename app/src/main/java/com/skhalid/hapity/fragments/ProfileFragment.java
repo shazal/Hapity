@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -75,7 +76,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
     EditText commentText;
     ImageView sendimg;
 
-    String userid="28";
+    String userid="0";
     String bID = "";
     String sURL = "";
 
@@ -99,6 +100,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
         Bundle bundle = getArguments();
         bID = bundle.getString("bID");
         sURL = bundle.getString("sURL");
+        userid = bundle.getString("uID");
         SegmentedGroup segmented2 = (SegmentedGroup) rootView.findViewById(R.id.segmented2);
         segmented2.setTintColor(Color.parseColor("#554979"));
 
@@ -147,7 +149,11 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
         super.onActivityCreated(savedInstanceState);
 
         if (LibsChecker.checkVitamioLibs(getActivity())) {
-            uri = Uri.parse(path);
+            if(sURL.equalsIgnoreCase("")) {
+                uri = Uri.parse(path);
+            } else {
+                uri = Uri.parse(sURL);
+            }
             mVideoView.setVideoURI(uri);
             mVideoView.requestFocus();
             mVideoView.setOnInfoListener(this);
@@ -246,7 +252,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
                             null,
                             createMyReqSuccessListenerFUF(),
                             createMyReqErrorListenerFUF());
-
+                    myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
                     VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
                 } else {
@@ -261,7 +267,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
                             createMyReqSuccessListenerFUF(),
                             createMyReqErrorListenerFUF());
 
-
+                    myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                     VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
 
                 }
@@ -283,7 +289,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
                         createMyReqSuccessListenerComment(),
                         createMyReqErrorListenerComment());
 
-
+                myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                 VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
             }
         });
@@ -310,7 +316,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
                 createMyReqSuccessListener(),
                 createMyReqErrorListener());
 
-
+        myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 

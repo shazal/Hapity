@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -107,7 +108,7 @@ public class BrowseFragment extends Fragment {
                 params,
                 createMyReqSuccessListener(),
                 createMyReqErrorListener());
-
+        myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
@@ -129,6 +130,9 @@ public class BrowseFragment extends Fragment {
                         sched.stream_url=bDetails[i].stream_url;
                         sched.id = bDetails[i].id;
                         sched.broadcast_image = bDetails[i].broadcast_image;
+                        sched.numberofLikes = bDetails[i].likes;
+                        sched.user_id = bDetails[i].user_id;
+                        sched.onlinestatus = bDetails[i].online_status;
                         broadcastArray.add(sched);
 
                     }

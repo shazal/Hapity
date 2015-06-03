@@ -51,7 +51,7 @@ public class ShareBroadcast extends Fragment {
                 RecordingFragment recordingFragment = new RecordingFragment();
                 recordingFragment.setArguments(bundle);
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.dash_container, recordingFragment);
+                transaction.replace(R.id.dash_container, recordingFragment, "RecordingFragment");
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 transaction.addToBackStack("recording");
 //                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);

@@ -39,6 +39,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
@@ -47,6 +48,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.skhalid.hapity.fragments.BottomFragment;
+import com.skhalid.hapity.fragments.BroadcastFragment;
 import com.skhalid.hapity.fragments.BroadcastListFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
 import com.skhalid.hapity.fragments.MyListsFragment;
@@ -86,6 +88,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
     public static String pfBID;
     public static String pfSURL;
     private boolean doubleBackToExitPressedOnce = false;
+    public static AccessToken aToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +130,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
         login = new LoginFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.dash_container, login);
+        transaction.replace(R.id.dash_container, login, "LoginFragment");
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //		transaction.addToBackStack("login");
 //      getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -344,7 +347,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
                         BroadcastListFragment broadcastListFragment = new BroadcastListFragment();
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.dash_container, broadcastListFragment);
+                        transaction.replace(R.id.dash_container, broadcastListFragment, "BroadcastListFragment");
                         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("posts");
                         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -371,7 +374,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
                         MyListsFragment myListsFragment = new MyListsFragment();
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.dash_container, myListsFragment);
+                        transaction.replace(R.id.dash_container, myListsFragment, "MyListsFragment");
                         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("profile");
                         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -396,7 +399,7 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
                 login = new LoginFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.dash_container, login);
+                transaction.replace(R.id.dash_container, login, "LoginFragment");
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //		transaction.addToBackStack("login");
                 getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -450,21 +453,35 @@ public class DashboardActivity extends ActionBarActivity implements GoogleApiCli
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
+        Fragment bFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("BroadcastListFragment");
+        Fragment browseFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("BrowseFragment");
+        Fragment mlFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("MyListsFragment");
+        Fragment sbFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("ShareBroadcast");
+        Fragment siFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("LoginFragment");
+        Fragment suFragment = (Fragment) getSupportFragmentManager().findFragmentByTag("SignupFragment");
+        if ((bFragment != null && bFragment.isVisible()) || (browseFragment != null && browseFragment.isVisible())
+                || (mlFragment != null && mlFragment.isVisible()) || (sbFragment != null && sbFragment.isVisible())
+                || (siFragment != null && siFragment.isVisible()) || (suFragment != null && suFragment.isVisible())) {
+            if (doubleBackToExitPressedOnce) {
+                super.onBackPressed();
+                return;
+            }
+
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    doubleBackToExitPressedOnce = false;
+                }
+            }, 2000);
+        } else {
             super.onBackPressed();
             return;
         }
 
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, 2000);
     }
 
     public static void showCustomProgress(final Context context, String Msg, Boolean isCancelable) {

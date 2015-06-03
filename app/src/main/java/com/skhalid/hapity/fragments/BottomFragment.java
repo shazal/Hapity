@@ -73,7 +73,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 
 					BrowseFragment browseFragment = new BrowseFragment();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, browseFragment);
+					transaction.replace(R.id.dash_container, browseFragment, "BrowseFragment");
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("browse");
                     getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -103,7 +103,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 
 					MyListsFragment myListsFragment = new MyListsFragment();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, myListsFragment);
+					transaction.replace(R.id.dash_container, myListsFragment, "MyListsFragment");
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("profile");
 					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -131,7 +131,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 
 					ShareBroadcast shareBroadcast = new ShareBroadcast();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, shareBroadcast);
+					transaction.replace(R.id.dash_container, shareBroadcast, "ShareBroadcast");
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("share");
 					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -162,7 +162,7 @@ public class BottomFragment extends Fragment implements OnClickListener
 
 					BroadcastListFragment broadcastListFragment = new BroadcastListFragment();
 					FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-					transaction.replace(R.id.dash_container, broadcastListFragment);
+					transaction.replace(R.id.dash_container, broadcastListFragment, "BroadcastListFragment");
 					transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //					transaction.addToBackStack("posts");
 					getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);

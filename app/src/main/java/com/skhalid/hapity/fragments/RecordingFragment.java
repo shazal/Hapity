@@ -22,6 +22,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -112,8 +113,8 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 //        if (mPrefs.getString("uri", null) != null)
             mLayoutServerSettings.setVisibility(View.GONE);
         mEditTextURI.setText(mPrefs.getString("uri", getString(R.string.default_stream)));
-        mEditTextPassword.setText(mPrefs.getString("password", "wozpubuser"));
-        mEditTextUsername.setText(mPrefs.getString("username", "Pu8Eg3n3_"));
+        mEditTextPassword.setText(mPrefs.getString("password", "Pu8Eg3n3_"));
+        mEditTextUsername.setText(mPrefs.getString("username", "wozpubuser"));
 
         // Configures the SessionBuilder
         mSession = SessionBuilder.getInstance()
@@ -390,7 +391,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
                 params,
                 startBroadcastSuccessListener(),
                 startBroadcastErrorListener());
-
+        myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 

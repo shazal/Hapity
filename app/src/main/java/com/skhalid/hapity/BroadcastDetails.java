@@ -10,4 +10,9 @@ public class BroadcastDetails {
     public String stream_url;
     public String broadcast_image;
     public String screen_name;
+    public String user_id;
+    public String online_status;
+    public String likes;
+
+
 }

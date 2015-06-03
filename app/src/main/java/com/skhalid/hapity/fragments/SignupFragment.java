@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -72,7 +73,9 @@ public class SignupFragment extends Fragment {
         Button mEmailSignInButton = (Button) getActivity().findViewById(R.id.email_sign_up_button);
         mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
+                DashboardActivity.hapityPref.edit().putString("type","manual");
                 attemptLogin();
             }
         });
@@ -185,6 +188,7 @@ public class SignupFragment extends Fragment {
 
 
         DashboardActivity.showCustomProgress(getActivity(), "", false);
+        myReq.setRetryPolicy(new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 

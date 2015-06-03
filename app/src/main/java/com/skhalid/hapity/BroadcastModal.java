@@ -15,6 +15,10 @@ public class BroadcastModal {
 	private String title;
 	public String stream_url;
 	public String broadcast_image;
+	public String numberofLikes = "0";
+    public String onlinestatus;
+    public String user_id;
+
 
 	public String getUserName() {
 		return userName;

@@ -34,10 +34,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import android.content.Intent;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -56,12 +58,17 @@ import com.skhalid.hapity.GsonRequest;
 import com.skhalid.hapity.Jsonexample;
 import com.skhalid.hapity.R;
 import com.skhalid.hapity.VolleySingleton;
+import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.services.StatusesService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +100,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mLoginFormView;
-    private String type;
+    public static String type;
     private String UserID;
     HashMap<String, String> params;
     public static SharedPreferences pref;
@@ -133,6 +140,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             @Override
             public void onClick(View view) {
                 type = "manual";
+                DashboardActivity.hapityPref.edit().putString("type",type).commit();
                 attemptLogin();
             }
         });
@@ -144,7 +152,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
                 SignupFragment signup = new SignupFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.dash_container, signup);
+                transaction.replace(R.id.dash_container, signup, "SignupFragment");
                 transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //		transaction.addToBackStack("login");
 //      getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -158,7 +166,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
        
         fbLoginButton = (Button) getActivity().findViewById(R.id.fb_login_button);
         loginButton = (Button) getActivity().findViewById(R.id.twitter_login_button);
-        
+
 
         mTwitterAuthClient= new TwitterAuthClient();
 
@@ -172,8 +180,10 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
                     @Override
                     public void success(Result<TwitterSession> twitterSessionResult) {
+
                         DashboardActivity.showCustomProgress(getActivity(), "", false);
                         type = "twitter";
+                        DashboardActivity.hapityPref.edit().putString("type",type).commit();
                         String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
                         params = new HashMap<String,String>();
                         UserID = twitterSessionResult.data.getUserId() + "";
@@ -202,7 +212,8 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                         try {
                             DashboardActivity.showCustomProgress(getActivity(), "", false);
                             type = "facebook_id";
-
+                            DashboardActivity.hapityPref.edit().putString("type",type).commit();
+                            DashboardActivity.aToken = loginResult.getAccessToken();
                             params = new HashMap<String, String>();
                             GraphRequest request = GraphRequest.newMeRequest(
                                     loginResult.getAccessToken(),
@@ -213,6 +224,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                                                 GraphResponse response) {
                                             // Application code
                                             try {
+
                                                 UserID = object.getString("id");
                                                 params.put(type, UserID);
                                                 String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
@@ -249,7 +261,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
         fbLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginManager.getInstance().logInWithReadPermissions(getActivity(), Arrays.asList("public_profile", "user_friends"));
+                LoginManager.getInstance().logInWithPublishPermissions(getActivity(), Arrays.asList("publish_actions"));
             }
         });
 
@@ -260,7 +272,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
             BroadcastListFragment twitsFragment = new BroadcastListFragment();
             FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.dash_container, twitsFragment);
+            transaction.replace(R.id.dash_container, twitsFragment, "BroadcastListFragment");
 
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("posts");
@@ -475,7 +487,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                 createMyReqSuccessListener(),
                 createMyReqErrorListener());
 
-
+        myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 
@@ -494,7 +506,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                     BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
                     BroadcastListFragment twitsFragment = new BroadcastListFragment();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, twitsFragment);
+                    transaction.replace(R.id.dash_container, twitsFragment, "BroadcastListFragment");
 
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("posts");
@@ -550,6 +562,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
 
         DashboardActivity.showCustomProgress(getActivity(), "", false);
+        myReq.setRetryPolicy(new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 
@@ -567,7 +580,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                     BottomFragment.homeButton.setImageDrawable(getResources().getDrawable(R.drawable.lists_pressed));
                     BroadcastListFragment twitsFragment = new BroadcastListFragment();
                     FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, twitsFragment);
+                    transaction.replace(R.id.dash_container, twitsFragment, "BroadcastListFragment");
 
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 //                    transaction.addToBackStack("posts");

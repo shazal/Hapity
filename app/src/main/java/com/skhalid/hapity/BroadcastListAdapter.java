@@ -1,6 +1,8 @@
 package com.skhalid.hapity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -20,13 +22,28 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.skhalid.hapity.fragments.BroadcastFragment;
 import com.skhalid.hapity.fragments.LoginFragment;
 import com.skhalid.hapity.fragments.ProfileFragment;
+import com.squareup.picasso.Picasso;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterApiClient;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.services.StatusesService;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 
@@ -104,6 +121,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
 
 
 
+            holder.type = (TextView) vi.findViewById(R.id.statusText);
              holder.like = (TextView) vi.findViewById(R.id.likeText);
             holder.like.setOnClickListener(new OnClickListener() {
                 @Override
@@ -122,7 +140,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                             createMyReqSuccessListener(),
                             createMyReqErrorListener());
 
-
+                    myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                     VolleySingleton.getInstance(activity).addToRequestQueue(myReq);
                 }
             });
@@ -143,7 +161,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                             null,
                             createMyReqSuccessListener(),
                             createMyReqErrorListener());
-
+                    myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
                     VolleySingleton.getInstance(activity).addToRequestQueue(myReq);
                 }
@@ -157,7 +175,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                     BroadcastFragment broadcastFragment = new BroadcastFragment();
                     broadcastFragment.setArguments(bundle);
                     FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.dash_container, broadcastFragment);
+                    transaction.replace(R.id.dash_container, broadcastFragment, "BroadcastFragment");
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                     transaction.addToBackStack("BroadcastFragment");
 //            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -180,7 +198,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
              tempValues = (BroadcastModal) data.get( position );
           
               holder.name.setText(tempValues.getTitle() + " (By "+ tempValues.getUserName() +")" );
-              holder.like.setText( " like" );
+              holder.like.setText(" like(" + data.get(position).numberofLikes +")");
               holder.dislike.setText(" dislike" );
               holder.comment.setText(tempValues.getComment());
               holder.share.setText(tempValues.getShare());
@@ -193,14 +211,81 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                 }
             });
 
+            holder.share.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DashboardActivity.showCustomProgress(activity, "", false);
+                    if(DashboardActivity.hapityPref.getString("type","0").equalsIgnoreCase("twitter")){
+                        TwitterSession session =
+                                Twitter.getSessionManager().getActiveSession();
+                        TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient(session);
+                        StatusesService statusesService = twitterApiClient.getStatusesService();
+                        statusesService.update(data.get(position).stream_url, null, null, null, null,
+                                null, null, null, new Callback<Tweet>() {
+                                    @Override
+                                    public void success(Result<Tweet> result) {
+                                        //Do something with result, which provides a Tweet inside of result.data
+                                        DashboardActivity.dismissCustomProgress();
+                                        Toast.makeText(activity, "Shared Successfully to Twitter", Toast.LENGTH_LONG).show();
+                                    }
+
+                                    public void failure(TwitterException exception) {
+                                        //Do something on failure
+                                        DashboardActivity.dismissCustomProgress();
+                                        Toast.makeText(activity, "Some problem in sharing to Twitter", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                    } else if(DashboardActivity.hapityPref.getString("type","0").equalsIgnoreCase("facebook_id")){
+                        GraphRequest request = GraphRequest.newPostRequest(
+                                DashboardActivity.aToken,
+                                "/me/feed",
+                                null,
+                                new GraphRequest.Callback() {
+                                    @Override
+                                    public void onCompleted(GraphResponse graphResponse) {
+                                        DashboardActivity.dismissCustomProgress();
+                                        if (graphResponse.getError() != null) {
+                                            Toast.makeText(activity, "Some Problem in sharing to Facebook", Toast.LENGTH_LONG).show();
+                                        } else {
+                                            Toast.makeText(activity, "Shared Successfully to Facebook", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("message", data.get(position).stream_url);
+                        request.setParameters(parameters);
+                        request.executeAsync();
+                    } else {
+                        DashboardActivity.dismissCustomProgress();
+                        Toast.makeText(activity, "You must be LoggedIn with fb or twitter to share", Toast.LENGTH_LONG).show();
+                    }
+
+                }
+            });
+
+            if(data.get(position).onlinestatus.equalsIgnoreCase("online")){
+                holder.type.setText("Online");
+                holder.type.setBackgroundDrawable(Resources.getSystem().getDrawable(R.drawable.live));
+            } else{
+                holder.type.setText("Offline");
+                holder.type.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.offline));
+            }
+
 
 //               holder.userImage.setImageResource(
 //                       res.getIdentifier(
 //                       "com.example.dreamtweats:drawable/"+tempValues.getUserPhoto()
 //                       ,null,null));
-             vi.setTag( holder );
+             vi.setTag(holder);
          }
 
+        if(!data.get(position).broadcast_image.trim().equalsIgnoreCase("")) {
+            Picasso.with(activity)
+                    .load(data.get(position).broadcast_image)
+                    .placeholder(R.drawable.broadcast_dummy)
+                    .centerCrop()
+                    .into(holder.broadcastImage);
+        }
          return vi;
 	}
 	@Override
@@ -213,10 +298,11 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
         Bundle bundle = new Bundle();
         bundle.putString("bID", data.get(mPosition2).id );
         bundle.putString("sURL", data.get(mPosition2).stream_url);
+        bundle.putString("uID", data.get(mPosition2).user_id);
         ProfileFragment profileFragment = new ProfileFragment();
         profileFragment.setArguments(bundle);
         FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.dash_container, profileFragment);
+        transaction.replace(R.id.dash_container, profileFragment, "ProfileFragment");
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         transaction.addToBackStack("ProfileFragment");
 //            activity.getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);

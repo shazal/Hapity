@@ -46,7 +46,8 @@ dependencies {
     compile 'info.hoang8f:android-segmented:1.0.5'
     compile project(':libstreaming')
     compile project(':vitamio')
-    compile files('libs/picasso-2.4.0.jar')
     compile project(':core')
     compile 'com.android.support:cardview-v7:22.1.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
 }

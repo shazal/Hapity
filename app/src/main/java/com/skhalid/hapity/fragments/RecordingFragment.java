@@ -3,10 +3,14 @@ package com.skhalid.hapity.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -26,8 +30,10 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.skhalid.hapity.BroadcastImageResp;
 import com.skhalid.hapity.DashboardActivity;
 import com.skhalid.hapity.GsonRequest;
+import com.skhalid.hapity.Jsonexample;
 import com.skhalid.hapity.NewBroadcastResponse;
 import com.skhalid.hapity.R;
 import com.skhalid.hapity.VolleySingleton;
@@ -39,9 +45,12 @@ import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.view.View.VISIBLE;
 
 
 public class RecordingFragment extends Fragment implements View.OnClickListener,
@@ -69,7 +78,8 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     private ProgressBar mProgressBar;
     private Session mSession;
     private RtspClient mClient;
-    private String shareTitle;
+    private String shareTitle = "";
+    private String partialBroadcastID = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -109,12 +119,11 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         mButtonSettings.setOnClickListener(this);
         mButtonFlash.setTag("off");
 
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 //        if (mPrefs.getString("uri", null) != null)
             mLayoutServerSettings.setVisibility(View.GONE);
-        mEditTextURI.setText(mPrefs.getString("uri", getString(R.string.default_stream)));
-        mEditTextPassword.setText(mPrefs.getString("password", "Pu8Eg3n3_"));
-        mEditTextUsername.setText(mPrefs.getString("username", "wozpubuser"));
+        mEditTextURI.setText(DashboardActivity.hapityPref.getString("uri", getString(R.string.default_stream)));
+        mEditTextPassword.setText(DashboardActivity.hapityPref.getString("password", "Pu8Eg3n3_"));
+        mEditTextUsername.setText(DashboardActivity.hapityPref.getString("username", "wozpubuser"));
 
         // Configures the SessionBuilder
         mSession = SessionBuilder.getInstance()
@@ -234,32 +243,13 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
     public void toggleStream() {
         mProgressBar.setVisibility(View.VISIBLE);
         if (!mClient.isStreaming()) {
-            String ip,port,path;
 
-            // We save the content user inputs in Shared Preferences
-            SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putString("uri", mEditTextURI.getText().toString());
-            editor.putString("password", mEditTextPassword.getText().toString());
-            editor.putString("username", mEditTextUsername.getText().toString());
-            editor.commit();
-
-            // We parse the URI written in the Editext
-            Pattern uri = Pattern.compile("rtsp://(.+):(\\d*)/(.+)");
-            Matcher m = uri.matcher(mEditTextURI.getText()); m.find();
-            ip = m.group(1);
-            port = m.group(2);
-            path = m.group(3);
-
-            mClient.setCredentials(mEditTextUsername.getText().toString(), mEditTextPassword.getText().toString());
-            mClient.setServerAddress(ip, Integer.parseInt(port));
-            mClient.setStreamPath("/" + path);
-            mClient.startStream();
             String url =null;
+            partialBroadcastID = System.currentTimeMillis() +  ".stream";
             if(DashboardActivity.hapityPref.getBoolean("shareLocation",false)){
-                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=" + shareTitle + "&geo_location="+DashboardActivity.hapityPref.getString("Lattitude", "0")+","+DashboardActivity.hapityPref.getString("Longitude", "0")+"&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=" + shareTitle + "&geo_location="+DashboardActivity.hapityPref.getString("Lattitude", "0")+","+DashboardActivity.hapityPref.getString("Longitude", "0")+"&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0) + "&stream_url=" + DashboardActivity.hapityPref.getString("uri", getString(R.string.default_stream)) + partialBroadcastID;
             } else {
-                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=" + shareTitle + "&geo_location=0,0&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0);
+                url = "http://testing.egenienext.com/project/hapity/webservice/startbroadcast/?title=" + shareTitle + "&geo_location=0,0&allow_user_messages=No&user_id=" + DashboardActivity.hapityPref.getInt("userid", 0) + "&stream_url=" + DashboardActivity.hapityPref.getString("uri", getString(R.string.default_stream)) + partialBroadcastID;
             }
 
             startBroadcast(url, null);
@@ -391,7 +381,7 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
                 params,
                 startBroadcastSuccessListener(),
                 startBroadcastErrorListener());
-        myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 
@@ -404,6 +394,40 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
                     DashboardActivity.dismissCustomProgress();
 
                     if(response.status.equalsIgnoreCase("success")){
+
+                        String ip,port,path;
+
+                        // We save the content user inputs in Shared Preferences
+                        SharedPreferences.Editor editor = DashboardActivity.hapityPref.edit();
+                        editor.putString("uri", mEditTextURI.getText().toString());
+                        editor.putString("password", mEditTextPassword.getText().toString());
+                        editor.putString("username", mEditTextUsername.getText().toString());
+                        editor.commit();
+
+                        // We parse the URI written in the Editext
+                        Pattern uri = Pattern.compile("rtsp://(.+):(\\d*)/(.+)");
+                        Matcher m = uri.matcher(mEditTextURI.getText() + partialBroadcastID); m.find();
+                        ip = m.group(1);
+                        port = m.group(2);
+                        path = m.group(3);
+
+                        mClient.setCredentials(mEditTextUsername.getText().toString(), mEditTextPassword.getText().toString());
+                        mClient.setServerAddress(ip, Integer.parseInt(port));
+                        mClient.setStreamPath("/" + path);
+                        mClient.startStream();
+
+                        Bitmap btmap =  screenShot(mSurfaceView);
+
+                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                        btmap.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                        byte[] ba = bytes.toByteArray();
+
+                        String url = "http://testing.egenienext.com/project/hapity/webservice/insert_broadcast_image/";
+                        HashMap<String, String> params = new HashMap<String,String>();
+                        params.put("broadcast_id", "test" + partialBroadcastID);
+                        params.put("broadcast_image", Base64.encodeToString(ba, Base64.DEFAULT));
+
+                        loadAPI(url, params);
 
                     }
                     else
@@ -422,12 +446,70 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
             public void onErrorResponse(VolleyError error) {
 
                 DashboardActivity.dismissCustomProgress();
+                mProgressBar.setVisibility(View.GONE);
 
                 if (error.networkResponse!=null) {
-                    if (error.networkResponse.statusCode == 500) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
-                    }
+                        Toast.makeText(getActivity(), "Invalid Response", Toast.LENGTH_LONG).show();
+
                 } else {
+                    Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+    }
+
+    public Bitmap screenShot(View view) {
+        Bitmap bitmap;
+        View v1 = view.getRootView();
+        v1.setDrawingCacheEnabled(true);
+        bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+        v1.setDrawingCacheEnabled(false);
+        return bitmap;
+    }
+
+    private void loadAPI(String url, HashMap<String, String> params) {
+
+        GsonRequest<BroadcastImageResp> myReq = new GsonRequest<BroadcastImageResp>(
+                Request.Method.POST,
+                url,
+                BroadcastImageResp.class,
+                null,
+                params,
+                createMyReqSuccessListener(),
+                createMyReqErrorListener());
+
+
+        DashboardActivity.showCustomProgress(getActivity(), "", false);
+        myReq.setRetryPolicy(new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
+    }
+
+    private Response.Listener<BroadcastImageResp> createMyReqSuccessListener() {
+        return new Response.Listener<BroadcastImageResp>() {
+            @Override
+            public void onResponse(BroadcastImageResp response) {
+                try {
+                    DashboardActivity.dismissCustomProgress();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        };
+    }
+
+    private Response.ErrorListener createMyReqErrorListener() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                DashboardActivity.dismissCustomProgress();
+                if (error.networkResponse != null){
+
+                    int statuscode = error.networkResponse.statusCode;
+                    if(statuscode == 404)
+                        Toast.makeText(getActivity(),  "missing parameter", Toast.LENGTH_LONG).show();
+
+                }else {
                     Toast.makeText(getActivity(), "Some Problem With Network", Toast.LENGTH_LONG).show();
                 }
             }

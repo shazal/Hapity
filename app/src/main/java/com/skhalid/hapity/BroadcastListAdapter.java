@@ -283,7 +283,6 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
             Picasso.with(activity)
                     .load(data.get(position).broadcast_image)
                     .placeholder(R.drawable.broadcast_dummy)
-                    .centerCrop()
                     .into(holder.broadcastImage);
         }
          return vi;

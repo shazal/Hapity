@@ -3,6 +3,7 @@ package com.skhalid.hapity.fragments;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -143,6 +144,12 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
     }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

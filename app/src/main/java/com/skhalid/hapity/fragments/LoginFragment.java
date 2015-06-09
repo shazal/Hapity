@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +32,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Intent;
 import android.widget.Toast;
@@ -43,6 +49,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -68,6 +75,7 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.models.User;
 import com.twitter.sdk.android.core.services.StatusesService;
 
 import org.json.JSONException;
@@ -106,6 +114,8 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     public static SharedPreferences pref;
     public static final String PREFS_NAME = "MyPrefsFile";
     private TwitterAuthClient mTwitterAuthClient;
+    String pic = "";
+    String ba1 = "";
 
     @Nullable
     @Override
@@ -160,6 +170,8 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             }
         });
 
+        Button selectPicture = (Button) getActivity().findViewById(R.id.picture_button);
+
         mLoginFormView = getActivity().findViewById(R.id.login_form);
 
 
@@ -183,12 +195,57 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
                         DashboardActivity.showCustomProgress(getActivity(), "", false);
                         type = "twitter";
+                        TwitterSession session =
+                                Twitter.getSessionManager().getActiveSession();
+                        TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient(session);
+
+                        twitterApiClient.getAccountService().verifyCredentials(true, false, new Callback<User>() {
+                            @Override
+                            public void success(Result<User> result) {
+                                pic = result.data.profileImageUrl;
+                                ImageRequest ir = new ImageRequest(pic, new Response.Listener<Bitmap>() {
+
+                                    @Override
+                                    public void onResponse(Bitmap response) {
+                                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                                        response.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                                        byte[] ba = bytes.toByteArray();
+                                        ba1 = Base64.encodeToString(ba, Base64.DEFAULT);
+                                        DashboardActivity.hapityPref.edit().putString("ba1",ba1).commit();
+
+                                        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+                                        scheduler.schedule(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+
+                                                String url = "http://testing.egenienext.com/project/hapity/webservice/insert_profile_picture";
+                                                HashMap<String, String> params1 = new HashMap<String, String>();
+                                                params1.put("user_id", DashboardActivity.hapityPref.getInt("userid", 0) + "");
+                                                params1.put("profile_picture", DashboardActivity.hapityPref.getString("ba1", "0"));
+                                                loadAPI_picupload(url, params1);
+
+                                            }
+                                        }, 5, TimeUnit.SECONDS);
+
+
+                                    }
+                                }, 0, 0, null, null);
+                                VolleySingleton.getInstance(getActivity()).addToRequestQueue(ir);
+                            }
+
+                            @Override
+                            public void failure(TwitterException e) {
+
+                            }
+                        });
                         DashboardActivity.hapityPref.edit().putString("type",type).commit();
                         String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
                         params = new HashMap<String,String>();
                         UserID = twitterSessionResult.data.getUserId() + "";
                         params.put("twitter_id", UserID);
                         loadAPI(url, params);
+
                     }
 
                     @Override
@@ -226,6 +283,33 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                                             try {
 
                                                 UserID = object.getString("id");
+                                                pic = object.getJSONObject("picture").getJSONObject("data").getString("url");
+                                                ImageRequest ir = new ImageRequest(pic, new Response.Listener<Bitmap>() {
+
+                                                    @Override
+                                                    public void onResponse(Bitmap response) {
+                                                        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                                                        response.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                                                        byte[] ba = bytes.toByteArray();
+                                                        ba1 = Base64.encodeToString(ba, Base64.DEFAULT);
+                                                        DashboardActivity.hapityPref.edit().putString("ba1",ba1).commit();
+                                                        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+                                                        scheduler.schedule(new Runnable() {
+
+                                                            @Override
+                                                            public void run() {
+
+                                                                        String url = "http://testing.egenienext.com/project/hapity/webservice/insert_profile_picture";
+                                                                HashMap<String, String> params1 = new HashMap<String, String>();
+                                                                        params1.put("user_id", DashboardActivity.hapityPref.getInt("userid", 0) + "");
+                                                                        params1.put("profile_picture", DashboardActivity.hapityPref.getString("ba1", "0"));
+                                                                        loadAPI_picupload(url, params1);
+
+                                                            }
+                                                        }, 5, TimeUnit.SECONDS);
+                                                    }
+                                                }, 0, 0, null, null);
+                                                VolleySingleton.getInstance(getActivity()).addToRequestQueue(ir);
                                                 params.put(type, UserID);
                                                 String url = "http://testing.egenienext.com/project/hapity/webservice/signin/";
                                                 loadAPI(url, params);
@@ -235,7 +319,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                                         }
                                     });
                             Bundle parameters = new Bundle();
-                            parameters.putString("fields", "id,name,email,gender, birthday");
+                            parameters.putString("fields", "id,name,email,gender, birthday, picture.width(300)");
                             request.setParameters(parameters);
                             request.executeAsync();
 //                    Profile.fetchProfileForCurrentAccessToken();
@@ -289,7 +373,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
 //
         if(requestCode == 195278 || requestCode == 64206) {
             callbackManager.onActivityResult(requestCode, resultCode, data);
-        } else {
+        } else if(requestCode == 140) {
             mTwitterAuthClient.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -487,7 +571,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
                 createMyReqSuccessListener(),
                 createMyReqErrorListener());
 
-        myReq.setRetryPolicy( new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        myReq.setRetryPolicy(new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
     }
 
@@ -572,8 +656,8 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             public void onResponse(Jsonexample response) {
                 try {
                     DashboardActivity.dismissCustomProgress();
-                    DashboardActivity.hapityPref.edit().putString("loggedin","1").commit();
-                    DashboardActivity.hapityPref.edit().putInt("userid",response.user_id).commit();
+                    DashboardActivity.hapityPref.edit().putString("loggedin", "1").commit();
+                    DashboardActivity.hapityPref.edit().putInt("userid", response.user_id).commit();
                     setFullscreen(false);
                     DashboardActivity.action_bar.show();
                     BottomFragment.isHomeActive = true;
@@ -626,6 +710,52 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
         }
         getActivity().getWindow().setAttributes(attrs);
+    }
+
+
+
+    private void loadAPI_picupload(String url, HashMap<String, String> params) {
+
+
+
+        GsonRequest<Jsonexample> myReq = new GsonRequest<Jsonexample>(
+                Request.Method.POST,
+                url,
+                Jsonexample.class,
+                null,
+                params,
+                createMyReqSuccessListener_picupload(),
+                createMyReqErrorListener_picupload());
+
+        myReq.setRetryPolicy(new DefaultRetryPolicy(3000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        VolleySingleton.getInstance(getActivity()).addToRequestQueue(myReq);
+    }
+
+    private Response.Listener<Jsonexample> createMyReqSuccessListener_picupload() {
+        return new Response.Listener<Jsonexample>() {
+            @Override
+            public void onResponse(Jsonexample response) {
+                try {
+                    DashboardActivity.hapityPref.edit().putString("ba1","0").commit();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            };
+        };
+    }
+
+    private Response.ErrorListener createMyReqErrorListener_picupload() {
+        return new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                DashboardActivity.hapityPref.edit().putString("ba1","0").commit();
+                if (error.networkResponse != null){
+                    int statuscode = error.networkResponse.statusCode;
+
+
+                }
+            }
+        };
     }
 }
 

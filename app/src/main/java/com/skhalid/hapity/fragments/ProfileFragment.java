@@ -373,7 +373,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
             public void onResponse(Jsonexample response) {
                 try {
                     DashboardActivity.dismissCustomProgress();
-                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Successfully Followed/Unfollowed", Toast.LENGTH_LONG).show();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -405,7 +405,7 @@ public class ProfileFragment extends Fragment implements io.vov.vitamio.MediaPla
             public void onResponse(Jsonexample response) {
                 try {
                     DashboardActivity.dismissCustomProgress();
-                    Toast.makeText(getActivity(), "Success", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Comment Posted Successfully", Toast.LENGTH_LONG).show();
                     commentText.setText("");
                 } catch (Exception e) {
                     e.printStackTrace();

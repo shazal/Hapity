@@ -170,7 +170,7 @@ public class BrowseFragment extends Fragment {
                                 }
                             });
                         }
-                    }, 30, TimeUnit.SECONDS);
+                    }, 3, TimeUnit.MINUTES);
 
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -75,6 +76,7 @@ public class SignupFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Set up the login form.
+        DashboardActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mEmailView = (AutoCompleteTextView) getActivity().findViewById(R.id.email_sign_up);
         mNameView = (AutoCompleteTextView) getActivity().findViewById(R.id.name_sign_up);
 
@@ -446,10 +448,8 @@ public class SignupFragment extends Fragment {
                 DashboardActivity.hapityPref.edit().putString("ba1","0").commit();
                 if (error.networkResponse != null) {
                     int statuscode = error.networkResponse.statusCode;
-                    Toast.makeText(getActivity(), "Picture Not Uploaded", Toast.LENGTH_LONG).show();
 
-                } else {
-                    Toast.makeText(getActivity(), "Some Problem with Network", Toast.LENGTH_LONG).show();
+
                 }
             }
         };

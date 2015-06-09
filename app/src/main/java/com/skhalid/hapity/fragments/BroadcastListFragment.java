@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public class BroadcastListFragment extends Fragment {
 		// TODO Auto-generated method stub
 		View rootView = inflater.inflate(R.layout.broadcast_list_fragment_layout, container,false);
 		BroadcastList = (ListView) rootView.findViewById(R.id.broadcastList);
-
+        DashboardActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		adapter = new BroadcastListAdapter(getActivity(), broadcastArray, getActivity().getResources());
 
 		if(BottomFragment.isHomeActive) {
@@ -150,7 +151,7 @@ public class BroadcastListFragment extends Fragment {
                                 }
                             });
                         }
-                    }, 30, TimeUnit.SECONDS);
+                    }, 3, TimeUnit.MINUTES);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

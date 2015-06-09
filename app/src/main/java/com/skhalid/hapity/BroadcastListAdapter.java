@@ -40,6 +40,7 @@ import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.models.User;
 import com.twitter.sdk.android.core.services.StatusesService;
 
 import org.json.JSONException;
@@ -219,6 +220,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
                         TwitterSession session =
                                 Twitter.getSessionManager().getActiveSession();
                         TwitterApiClient twitterApiClient = TwitterCore.getInstance().getApiClient(session);
+
                         StatusesService statusesService = twitterApiClient.getStatusesService();
                         statusesService.update(data.get(position).stream_url, null, null, null, null,
                                 null, null, null, new Callback<Tweet>() {
@@ -314,7 +316,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
             public void onResponse(Jsonexample response) {
                 try {
                     DashboardActivity.dismissCustomProgress();
-                    Toast.makeText(activity, response.status, Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, "Successfully Liked/Disliked", Toast.LENGTH_LONG).show();
 
                     if(likeview != null){
                         TextView vi = (TextView)likeview;
@@ -359,5 +361,7 @@ public class BroadcastListAdapter extends BaseAdapter implements OnClickListener
             }
         };
     }
+
+
 
 }

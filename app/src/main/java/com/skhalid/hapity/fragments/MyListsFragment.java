@@ -24,7 +24,11 @@ import com.skhalid.hapity.R;
 import com.skhalid.hapity.VolleySingleton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by skhalid on 5/25/2015.
@@ -118,8 +122,27 @@ public class MyListsFragment extends Fragment {
                         broadcastArray.add(sched);
 
                     }
+                    Collections.reverse(broadcastArray);
                     DashboardActivity.dismissCustomProgress();
                     BroadcastList.setAdapter(adapter);
+                    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+                    scheduler.schedule(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Fragment bFragment = (Fragment) getFragmentManager().findFragmentByTag("BroadcastListFragment");
+                                    if (bFragment != null && bFragment.isVisible()) {
+                                        String url = "http://testing.egenienext.com/project/hapity/webservice/getbroadcast?user_id=" + DashboardActivity.hapityPref.getInt("userid",0);
+
+                                        loadAPI(url, null);
+                                    }
+                                }
+                            });
+                        }
+                    }, 30, TimeUnit.SECONDS);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

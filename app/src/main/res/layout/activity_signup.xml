@@ -81,6 +81,15 @@
                 android:layout_gravity="center"
                 />
 
+            <Button android:id="@+id/picture_button" style="?android:textAppearanceSmall"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Select Pictutre"
+                android:textStyle="bold"
+                android:background="@drawable/button2unselected"
+                android:layout_marginBottom="15dp"
+                android:textColor="@color/tw__solid_white"
+                android:layout_gravity="center"/>
+
             <Button android:id="@+id/email_sign_up_button" style="?android:textAppearanceSmall"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"
                  android:text="@string/action_sign_up"

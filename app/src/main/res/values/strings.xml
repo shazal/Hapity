@@ -15,6 +15,7 @@
         <item>Home</item>
         <item>History</item>
         <item>Settings</item>
+        <item>Terms and Conditions</item>
         <item>Logout</item>
     </string-array>
 
@@ -24,6 +25,7 @@
         <item>@drawable/menu1selected</item>
         <item>@drawable/menu2selected</item>
         <item>@drawable/menu3selected</item>
+        <item>@drawable/menu4selected</item>
         <item>@drawable/menu5selected</item>
 
 

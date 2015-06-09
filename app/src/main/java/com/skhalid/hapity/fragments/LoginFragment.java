@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.DrawerLayout;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.view.KeyEvent;
@@ -129,6 +130,7 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Set up the login form.
+        DashboardActivity.mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         pref = getActivity().getSharedPreferences(PREFS_NAME, 0);
         mEmailView = (AutoCompleteTextView) getActivity().findViewById(R.id.email);
         populateAutoComplete();
@@ -364,6 +366,15 @@ public class LoginFragment extends Fragment implements LoaderCallbacks<Cursor> {
             transaction.commitAllowingStateLoss();
             DashboardActivity.bottom_fragment.getView().setVisibility(VISIBLE);
         }
+
+        TextView fPW = (TextView) getActivity().findViewById(R.id.forgotpw);
+        fPW.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.google.com"));
+                startActivity(browserIntent);
+            }
+        });
     }
 
 

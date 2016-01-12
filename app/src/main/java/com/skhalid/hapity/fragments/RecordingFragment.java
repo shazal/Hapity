@@ -3,6 +3,7 @@ package com.skhalid.hapity.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.hardware.Camera;
@@ -156,6 +157,13 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
         selectQuality();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+       getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
     }
 
     @Override
@@ -359,8 +367,8 @@ public class RecordingFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mSession.setPreviewOrientation(90);
-        mSession.configure();
+//        mSession.setPreviewOrientation(90);
+//        mSession.configure();
         mSession.startPreview();
     }
 
